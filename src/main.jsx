@@ -3,10 +3,11 @@ import { createRoot } from 'react-dom/client';
 
 import { FloralDefs } from './florals.jsx';
 import {
-  HeroSection, CountdownSection, ScheduleSection, VenuesSection,
+  HeroSection, CountdownSection, ScheduleSection,
   GallerySection, VideoSection, RsvpSection,
 } from './sections.jsx';
 import { readGuestNameFromUrl, readGuestCountFromUrl } from './nameCodec.js';
+import { createIdleDetector } from './idleNudge.js';
 
 const NavDots = ({ sections, active, onGo }) => (
   <nav className="nav-dots" aria-label="sections">
@@ -58,39 +59,31 @@ const App = () => {
     if (el) window.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
   };
 
-  // If the visitor hasn't scrolled after 5 seconds, add a `.nudge` class to
-  // the hero's scroll cue so it starts bouncing. Remove it the moment they
-  // start scrolling — we only want to prod idle users.
+  // If the visitor hasn't scrolled after 3 seconds, add `.nudge` to the hero
+  // scroll cue so it starts bouncing. Any subsequent scroll/wheel/touch/key
+  // input cancels everything: it removes the class (if added), stops the
+  // detector, and unhooks the listeners — we only want to nudge once, when
+  // a visitor arrives and sits still.
   useEffect(() => {
-    let idleTimer;
-    let cue;
-
-    const start = () => {
-      cue = document.querySelector('#hero .scroll-cue');
-      if (cue) cue.classList.add('nudge');
-    };
-    const stop = () => {
+    let cue = null;
+    const detector = createIdleDetector({
+      delay: 3000,
+      onIdle: () => {
+        cue = document.querySelector('#hero .scroll-cue');
+        if (cue) cue.classList.add('nudge');
+      },
+    });
+    const cancel = () => {
       if (cue) cue.classList.remove('nudge');
-      clearTimeout(idleTimer);
-      window.removeEventListener('scroll', onScroll, { passive: true });
-      window.removeEventListener('wheel', onScroll, { passive: true });
-      window.removeEventListener('touchmove', onScroll, { passive: true });
-      window.removeEventListener('keydown', onScroll);
+      detector.stop();
+      events.forEach(e => window.removeEventListener(e, cancel));
     };
-    const onScroll = () => stop();
-
-    idleTimer = setTimeout(start, 3000);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('wheel', onScroll, { passive: true });
-    window.addEventListener('touchmove', onScroll, { passive: true });
-    window.addEventListener('keydown', onScroll);
-
+    const events = ['scroll', 'wheel', 'touchmove', 'keydown'];
+    events.forEach(e => window.addEventListener(e, cancel, { passive: true }));
+    detector.start();
     return () => {
-      clearTimeout(idleTimer);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('wheel', onScroll);
-      window.removeEventListener('touchmove', onScroll);
-      window.removeEventListener('keydown', onScroll);
+      detector.stop();
+      events.forEach(e => window.removeEventListener(e, cancel));
     };
   }, []);
 

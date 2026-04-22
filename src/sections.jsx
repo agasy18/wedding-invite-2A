@@ -9,60 +9,8 @@ import { submitRsvp } from './rsvpForm.js';
 import { VideoPlayer } from './VideoPlayer.jsx';
 import { AgendaBackdrop } from './AgendaBackdrop.jsx';
 import { buildOccupancy, findEmptyRects, rectToCell } from './gridFillers.js';
-
-// --- Helpers ----------------------------------------------------------------
-
-const useInView = (threshold = 0.2) => {
-  const ref = useRef(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    if (!ref.current) return;
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setInView(true); },
-      { threshold }
-    );
-    obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [threshold]);
-  return [ref, inView];
-};
-
-export const Reveal = ({ children, delay = 0, as: Tag = 'div', style, className }) => {
-  const [ref, inView] = useInView(0.15);
-  return (
-    <Tag ref={ref} className={className}
-      style={{
-        ...style,
-        opacity: inView ? 1 : 0,
-        transform: inView ? 'translateY(0)' : 'translateY(22px)',
-        transition: `opacity 1.1s ${delay}ms cubic-bezier(.22,.61,.36,1), transform 1.1s ${delay}ms cubic-bezier(.22,.61,.36,1)`,
-      }}>
-      {children}
-    </Tag>
-  );
-};
-
-// Reusable scroll hint anchored to the bottom of each section. Click or
-// tap smooth-scrolls to the next section. The hero variant also supports a
-// `.nudge` class added by the idle-detector in main.jsx (left untouched).
-export const ScrollCue = ({ nextId, label = 'թերթել' }) => {
-  const onGo = () => {
-    if (!nextId) return;
-    const el = document.getElementById(nextId);
-    if (el) window.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
-  };
-  return (
-    <button
-      type="button"
-      className="scroll-cue"
-      onClick={onGo}
-      aria-label={nextId ? `Գնալ հաջորդ բաժին` : undefined}
-    >
-      <span>{label}</span>
-      <div className="scroll-line" aria-hidden />
-    </button>
-  );
-};
+import { Reveal } from './Reveal.jsx';
+import { ScrollCue } from './ScrollCue.jsx';
 
 // --- Section 1: Hero --------------------------------------------------------
 
@@ -288,77 +236,7 @@ export const ScheduleSection = () => {
   );
 };
 
-// --- Section 4: Venues ------------------------------------------------------
-
-const VenueCard = ({ label, name, address, mapLinks = [], accent, flowerTop, flowerBot, delay }) => (
-  <Reveal delay={delay} className="venue-card" as="div">
-    <div className="venue-flower top" aria-hidden>{flowerTop}</div>
-    <div className="venue-flower bot" aria-hidden>{flowerBot}</div>
-    <div className="venue-label">{label}</div>
-    <h3 className="venue-name">{name}</h3>
-    <p className="venue-addr">{address}</p>
-    <div className="venue-map" style={{ background: accent }}>
-      <svg viewBox="0 0 300 180" width="100%" height="100%" preserveAspectRatio="none">
-        <defs>
-          <pattern id={`grid-${label}`} width="20" height="20" patternUnits="userSpaceOnUse">
-            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(107,31,42,0.08)" strokeWidth="0.5" />
-          </pattern>
-        </defs>
-        <rect width="300" height="180" fill={`url(#grid-${label})`} />
-        <path d="M 0 110 Q 80 80 150 100 T 300 90" stroke="rgba(107,31,42,0.18)" fill="none" strokeWidth="1.5" />
-        <path d="M 0 60 Q 100 70 180 50 T 300 60" stroke="rgba(107,31,42,0.14)" fill="none" strokeWidth="1" />
-        <circle cx="150" cy="90" r="10" fill="var(--c-wine)" />
-        <circle cx="150" cy="90" r="4" fill="var(--c-ivory)" />
-        <circle cx="150" cy="90" r="18" fill="none" stroke="var(--c-wine)" strokeWidth="1" opacity="0.4" />
-      </svg>
-    </div>
-    <div className="venue-cta-row">
-      {mapLinks.map(m => (
-        <a key={m.url} className="venue-cta" href={m.url} target="_blank" rel="noopener">
-          <FloralPin size={15} /> {m.label}
-        </a>
-      ))}
-    </div>
-  </Reveal>
-);
-
-export const VenuesSection = () => (
-  <section className="section venues" data-screen-label="04 Venues">
-    <Reveal><div className="section-kicker"><ArmDivider width={80} /></div></Reveal>
-    <Reveal delay={100}><h2 className="section-title">Վայրեր</h2></Reveal>
-
-    <div className="venue-grid">
-      <VenueCard
-        label="ՊՍԱԿԱԴՐՈՒԹՅՈՒՆ"
-        name="Հովհաննավանք"
-        address="Օհանավան, Արագածոտնի մարզ"
-        mapLinks={[
-          { label: 'Google Maps', url: 'https://maps.app.goo.gl/oXYfuaTVpYhbXRYE8' },
-          { label: 'Yandex Maps', url: 'https://yandex.com/maps/-/CPC-ASzc' },
-        ]}
-        accent="linear-gradient(135deg, #FDF3E7 0%, #F9E4D4 100%)"
-        flowerTop={<Rose size={80} color="var(--c-blush)" />}
-        flowerBot={<Daisy size={44} />}
-        delay={200}
-      />
-      <VenueCard
-        label="ՀԱՆԴԻՍՈՒԹՅՈՒՆ"
-        name="Ոսկեվազի Գինու Գործարան"
-        address="Ոսկեվազ, Արագածոտնի մարզ"
-        mapLinks={[
-          { label: 'Google Maps', url: 'https://maps.app.goo.gl/UnzKpZSZVogbC2kv9' },
-          { label: 'Yandex Maps', url: 'https://yandex.com/maps/-/CPC-E01X' },
-        ]}
-        accent="linear-gradient(135deg, #F3E8F0 0%, #E8DEEA 100%)"
-        flowerTop={<Cosmos size={70} color="var(--c-coral)" />}
-        flowerBot={<Cluster size={50} color="var(--c-peri)" />}
-        delay={360}
-      />
-    </div>
-  </section>
-);
-
-// --- Section 5: Gallery -----------------------------------------------------
+// --- Section 4: Gallery -----------------------------------------------------
 
 // DOM glue for the gallery's dynamic floral fillers. Measures each photo
 // tile's pixel rect, hands the numbers to gridFillers (pure, unit-tested),
