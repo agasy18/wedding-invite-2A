@@ -266,13 +266,22 @@ body::before {
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  /* Button reset — the cue is now interactive (click/tap jumps to next). */
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 6px 10px;
+  cursor: pointer;
   font-family: var(--f-arm);
   font-size: 11px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--c-wine-2);
   animation: cue-pulse 2.4s ease-in-out infinite;
+  z-index: 5;
 }
+.scroll-cue:hover { color: var(--c-wine); }
+.scroll-cue:focus-visible { outline: 2px solid var(--c-gold); outline-offset: 4px; }
 
 @keyframes cue-pulse {
   0%, 100% { opacity: 0.5; }
@@ -483,10 +492,14 @@ body::before {
   pointer-events: none;
 }
 
-.schedule > *:not(.agenda-bg) {
+/* Lift all direct children above the backdrop — except .scroll-cue, which
+   needs its own `position: absolute` to pin to the section bottom. We still
+   bump its z-index so it clears the agenda backdrop. */
+.schedule > *:not(.agenda-bg):not(.scroll-cue) {
   position: relative;
   z-index: 1;
 }
+.schedule > .scroll-cue { z-index: 2; }
 
 /* Agenda content wrapper — just centers content and holds it above the
    corner photo. No card chrome; the photo is a decoration, not a full
@@ -938,7 +951,9 @@ body::before {
 .gallery.section {
   min-height: auto;
   justify-content: flex-start;
-  padding-bottom: clamp(80px, 10vw, 120px);
+  /* Extra bottom space so the absolutely-positioned .scroll-cue lands in a
+     clear strip below the mosaic instead of overlapping the last photos. */
+  padding-bottom: clamp(140px, 14vw, 180px);
 }
 
 /* Mosaic grid — 4 columns on mobile, 6 on desktop. `dense` packing lets
@@ -993,6 +1008,10 @@ body::before {
 .span-wide { grid-column: span 4; grid-row: span 2; }  /* landscape banner   */
 .span-tall { grid-column: span 2; grid-row: span 3; }  /* tall portrait      */
 .span-hero { grid-column: span 4; grid-row: span 3; }  /* full-width anchor  */
+/* Floral fillers use inline grid-column/row set by useGridFillers. Only
+   show them on desktop (6-col layout) where the mixed photo spans leave
+   leftover cells; on mobile the 4-col grid packs cleanly without them. */
+.gm-filler { display: none; }
 
 @media (min-width: 720px) {
   /* Desktop 6-col: hero tiles become 3 wide instead of 4, keeping them
@@ -1001,6 +1020,25 @@ body::before {
   .span-wide { grid-column: span 4; grid-row: span 2; }
   .span-tall { grid-column: span 2; grid-row: span 3; }
   .span-hero { grid-column: span 3; grid-row: span 3; }
+  .gm-filler { display: grid; }
+}
+
+/* Floral filler tile — cream card with a centered motif. No hover/shadow so
+   it reads as decoration, not another clickable photo. */
+.gm-filler {
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(251,245,236,1) 0%, rgba(245,232,214,1) 100%);
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(107, 31, 42, 0.06);
+  overflow: hidden;
+  opacity: 0.9;
+}
+.gm-filler > svg {
+  width: 56%;
+  height: auto;
+  max-width: 120px;
+  opacity: 0.85;
 }
 
 /* Lightbox overlay */

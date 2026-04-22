@@ -8,6 +8,7 @@ import { pronoun } from './nameCodec.js';
 import { submitRsvp } from './rsvpForm.js';
 import { VideoPlayer } from './VideoPlayer.jsx';
 import { AgendaBackdrop } from './AgendaBackdrop.jsx';
+import { buildOccupancy, findEmptyRects, rectToCell } from './gridFillers.js';
 
 // --- Helpers ----------------------------------------------------------------
 
@@ -38,6 +39,28 @@ export const Reveal = ({ children, delay = 0, as: Tag = 'div', style, className 
       }}>
       {children}
     </Tag>
+  );
+};
+
+// Reusable scroll hint anchored to the bottom of each section. Click or
+// tap smooth-scrolls to the next section. The hero variant also supports a
+// `.nudge` class added by the idle-detector in main.jsx (left untouched).
+export const ScrollCue = ({ nextId, label = 'թերթել' }) => {
+  const onGo = () => {
+    if (!nextId) return;
+    const el = document.getElementById(nextId);
+    if (el) window.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
+  };
+  return (
+    <button
+      type="button"
+      className="scroll-cue"
+      onClick={onGo}
+      aria-label={nextId ? `Գնալ հաջորդ բաժին` : undefined}
+    >
+      <span>{label}</span>
+      <div className="scroll-line" aria-hidden />
+    </button>
   );
 };
 
@@ -103,10 +126,7 @@ export const HeroSection = ({ guestName }) => {
         </div>
       </div>
 
-      <div className="scroll-cue" aria-hidden>
-        <span>թերթել</span>
-        <div className="scroll-line" />
-      </div>
+      <ScrollCue nextId="video" />
     </section>
   );
 };
@@ -156,6 +176,7 @@ export const CountdownSection = () => {
       <Reveal delay={380}>
         <p className="countdown-foot">մինչև մեր մեծ օրը</p>
       </Reveal>
+      <ScrollCue nextId="schedule" />
     </section>
   );
 };
@@ -262,6 +283,7 @@ export const ScheduleSection = () => {
           ))}
         </div>
       </div>
+      <ScrollCue nextId="gallery" />
     </section>
   );
 };
@@ -338,22 +360,71 @@ export const VenuesSection = () => (
 
 // --- Section 5: Gallery -----------------------------------------------------
 
+// DOM glue for the gallery's dynamic floral fillers. Measures each photo
+// tile's pixel rect, hands the numbers to gridFillers (pure, unit-tested),
+// and re-runs on resize. Returns the filler rectangles in cell coordinates.
+const useGridFillers = (gridRef, photoCount) => {
+  const [rects, setRects] = useState([]);
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    const measure = () => {
+      const cs = getComputedStyle(grid);
+      const colTracks = cs.gridTemplateColumns.split(' ').map(parseFloat).filter(n => !isNaN(n));
+      const cols = colTracks.length;
+      if (cols < 2) { setRects([]); return; } // not laid out yet
+      const colStride = colTracks[0];
+      const gapX = parseFloat(cs.columnGap || cs.gap || '0') || 0;
+      const gapY = parseFloat(cs.rowGap || cs.gap || '0') || 0;
+
+      const gridRect = grid.getBoundingClientRect();
+      const tiles = Array.from(grid.querySelectorAll('.gm-item'));
+      if (tiles.length === 0) { setRects([]); return; }
+
+      // Infer row stride from the smallest vertical delta between any two
+      // tile tops. If all tiles happen to share a top (only one row visible),
+      // fall back to grid-auto-rows. rowStride includes one row gap.
+      const tops = [...new Set(tiles.map(t => Math.round(t.getBoundingClientRect().top - gridRect.top)))].sort((a, b) => a - b);
+      const rowStride = tops.length > 1 ? (tops[1] - tops[0]) : (parseFloat(cs.gridAutoRows) || 120);
+      if (rowStride <= 0) { setRects([]); return; }
+
+      // Convert each tile rect to cell coordinates, then compute empty rects.
+      const placed = tiles.map(t => {
+        const r = t.getBoundingClientRect();
+        return rectToCell(
+          { x: r.left - gridRect.left, y: r.top - gridRect.top, width: r.width, height: r.height },
+          { colStride, rowStride, gapX, gapY }
+        );
+      });
+      const occ = buildOccupancy(placed, cols);
+      setRects(findEmptyRects(occ));
+    };
+
+    // Initial measure needs to wait for images to load (they affect nothing
+    // here since grid is fixed-row, but run on the next frame to be safe).
+    const raf = requestAnimationFrame(measure);
+    const ro = new ResizeObserver(measure);
+    ro.observe(grid);
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
+  }, [gridRef, photoCount]);
+  return rects;
+};
+
 export const GallerySection = () => {
-  // Ring now opens the mosaic as the full-width anchor (emotional hook:
-  // "what's this?"). Embrace moves to the tall-pair finale, landing with a
-  // portrait reveal of the couple. Grid math is preserved since both are
-  // 3:4 portraits — only the file numbers rotate.
   const photos = [
     { n: '08', span: 'span-hero' },   // ring — full-width anchor/opener
-    { n: '02', span: 'span-tall' },   // cinematic portrait
-    { n: '03', span: 'span-tall' },   // smile (paired with 02)
-    { n: '04', span: 'span-1' },      // Prague (square tile)
-    { n: '05', span: 'span-wide' },   // lake — landscape banner
-    { n: '06', span: 'span-1' },      // dinner (paired with 04)
-    { n: '07', span: 'span-tall' },   // champagne
-    { n: '01', span: 'span-tall' },   // embrace (paired with 07) — finale
+    { n: '02', span: 'span-tall' },
+    { n: '03', span: 'span-tall' },
+    { n: '04', span: 'span-1' },
+    { n: '05', span: 'span-wide' },
+    { n: '06', span: 'span-1' },
+    { n: '07', span: 'span-tall' },
+    { n: '01', span: 'span-tall' },   // embrace — finale
   ];
   const base = import.meta.env.BASE_URL;
+  const gridRef = useRef(null);
+  const fillerRects = useGridFillers(gridRef, photos.length);
 
   const [preview, setPreview] = useState(null); // index of photo shown in lightbox
 
@@ -380,7 +451,7 @@ export const GallerySection = () => {
       <Reveal><div className="section-kicker"><ArmDivider width={80} /></div></Reveal>
       <Reveal delay={100}><h2 className="section-title">Մեր պահերը</h2></Reveal>
 
-      <div className="gallery-mosaic">
+      <div className="gallery-mosaic" ref={gridRef}>
         {photos.map((p, i) => (
           <Reveal key={p.n} delay={100 + (i % 4) * 60} className={`gm-item ${p.span}`} as="button">
             <img
@@ -393,6 +464,27 @@ export const GallerySection = () => {
             />
           </Reveal>
         ))}
+        {/* Dynamic floral fillers. Positions and sizes are measured from the
+            laid-out grid (see useGridFillers) so each rectangle exactly covers
+            an empty region. The motif rotates through a small pool for visual
+            variety. */}
+        {fillerRects.map((r, i) => {
+          const MOTIFS = [Rose, Daisy, Cosmos, Cluster, Petal];
+          const Motif = MOTIFS[i % MOTIFS.length];
+          return (
+            <div
+              key={`f-${r.col}-${r.row}`}
+              className="gm-filler"
+              aria-hidden
+              style={{
+                gridColumn: `${r.col + 1} / span ${r.colSpan}`,
+                gridRow: `${r.row + 1} / span ${r.rowSpan}`,
+              }}
+            >
+              <Motif size={64} />
+            </div>
+          );
+        })}
       </div>
 
       {preview != null && (
@@ -408,6 +500,7 @@ export const GallerySection = () => {
           <button className="gm-nav gm-next" aria-label="Հաջորդը" onClick={(e) => { e.stopPropagation(); go(1); }}>›</button>
         </div>
       )}
+      <ScrollCue nextId="rsvp" />
     </section>
   );
 };
@@ -427,6 +520,7 @@ export const VideoSection = ({ guestName }) => {
       <Reveal delay={220}>
         <p className="video-caption">Հատուկ {you} համար</p>
       </Reveal>
+      <ScrollCue nextId="countdown" />
     </section>
   );
 };

@@ -66,7 +66,7 @@ const App = () => {
     let cue;
 
     const start = () => {
-      cue = document.querySelector('.scroll-cue');
+      cue = document.querySelector('#hero .scroll-cue');
       if (cue) cue.classList.add('nudge');
     };
     const stop = () => {
