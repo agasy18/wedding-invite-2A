@@ -78,18 +78,21 @@ body::before {
 .section-title {
   font-family: var(--f-arm-disp);
   font-weight: 400;
-  font-size: clamp(32px, 6.2vw, 64px);
+  /* Smaller upper bound on mobile so long Armenian titles don't overflow;
+     only the larger desktop size trips the cap at 64px. */
+  font-size: clamp(28px, 6vw, 56px);
   letter-spacing: -0.01em;
   margin: 0 0 18px;
   padding: 0 8px;
   color: var(--c-wine);
-  line-height: 1.15;
+  line-height: 1.2;
   max-width: 100%;
   overflow-wrap: break-word;
-  white-space: nowrap;
-}
-@media (max-width: 420px) {
-  .section-title { white-space: normal; }
+  /* Wrap naturally at all sizes. Desktop titles tend to fit on one line
+     because of the vw clamp; long Armenian titles wrap cleanly instead of
+     forcing horizontal overflow. */
+  white-space: normal;
+  hyphens: manual;
 }
 
 .section-sub {
