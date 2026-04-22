@@ -72,15 +72,16 @@ function base64urlDecode(str) {
   return bytes;
 }
 
-export function encodeName(name) {
-  const trimmed = (name ?? '').trim();
-  if (!trimmed) return '';
-  const id = NAME_TO_ID[trimmed];
+// Single-token encoder: dict ID or base64url fallback.
+function encodeToken(token) {
+  const t = token.trim();
+  if (!t) return '';
+  const id = NAME_TO_ID[t];
   if (id) return id;
-  return 'b.' + base64urlEncode(new TextEncoder().encode(trimmed));
+  return 'b.' + base64urlEncode(new TextEncoder().encode(t));
 }
 
-export function decodeName(param) {
+function decodeToken(param) {
   if (!param) return '';
   if (param.startsWith('b.')) {
     try {
@@ -90,6 +91,76 @@ export function decodeName(param) {
     }
   }
   return ID_TO_NAME[param] ?? param;
+}
+
+// Separators supported in the source name, each mapped to a one-char code.
+// Chosen so the "rejoin" step uses `..<code>` — a sequence that cannot appear
+// inside a single token (neither dict IDs nor the base64url alphabet contain
+// consecutive dots). This keeps multi-token URLs trivially splittable.
+const SEP_TO_CODE = { ' և ': '1', ' ու ': '2', ', ': '3', ',': '3' };
+const CODE_TO_SEP = { '1': ' և ', '2': ' ու ', '3': ', ' };
+const JOIN_MARKER = '..';
+
+// Split a name on supported separators. Returns [{ token, sep }] where sep
+// is the separator that FOLLOWS this token (empty string for the last).
+function splitName(name) {
+  const parts = [];
+  let rest = name;
+  while (rest.length) {
+    let earliestIdx = -1;
+    let earliestSep = '';
+    for (const sep of Object.keys(SEP_TO_CODE)) {
+      const idx = rest.indexOf(sep);
+      if (idx >= 0 && (earliestIdx === -1 || idx < earliestIdx)) {
+        earliestIdx = idx;
+        earliestSep = sep;
+      }
+    }
+    if (earliestIdx === -1) {
+      parts.push({ token: rest, sep: '' });
+      break;
+    }
+    parts.push({ token: rest.slice(0, earliestIdx), sep: earliestSep });
+    rest = rest.slice(earliestIdx + earliestSep.length);
+  }
+  return parts;
+}
+
+export function encodeName(name) {
+  const trimmed = (name ?? '').trim();
+  if (!trimmed) return '';
+
+  const parts = splitName(trimmed);
+  // Single token → keep the compact form so old URLs stay valid.
+  if (parts.length === 1) return encodeToken(parts[0].token);
+
+  // Multi-token: encode each, join with `..<code>`, prefix with `m.`.
+  let out = 'm.';
+  for (let i = 0; i < parts.length; i++) {
+    out += encodeToken(parts[i].token);
+    if (parts[i].sep) out += JOIN_MARKER + SEP_TO_CODE[parts[i].sep];
+  }
+  return out;
+}
+
+export function decodeName(param) {
+  if (!param) return '';
+  if (!param.startsWith('m.')) return decodeToken(param);
+
+  const body = param.slice(2);
+  // Split on `..<code>`; keep the separator code so we can reinsert text.
+  const segments = body.split(JOIN_MARKER);
+  if (segments.length === 1) return decodeToken(body);
+
+  // First segment is a plain token. Subsequent segments start with a 1-char
+  // separator code followed by the next token.
+  let out = decodeToken(segments[0]);
+  for (let i = 1; i < segments.length; i++) {
+    const seg = segments[i];
+    const sep = CODE_TO_SEP[seg[0]] ?? ' ';
+    out += sep + decodeToken(seg.slice(1));
+  }
+  return out;
 }
 
 export function isDictionaryHit(name) {
