@@ -120,8 +120,11 @@ export const Petal = ({ size = 20, color = 'var(--c-blush)', style }) => (
 
 // Location pin shaped like a flower — a teardrop outline with a 5-petal
 // daisy as the inner glyph instead of the usual solid dot.
+//
+// viewBox is deliberately padded (-14 -16 28 32) so neither the top curve
+// nor the stroke get clipped. The natural aspect ratio is 28:32 ≈ 7:8.
 export const FloralPin = ({ size = 18, color = 'var(--c-wine)', petal = 'var(--c-ivory)', center = 'var(--c-butter)', style, className }) => (
-  <svg viewBox="-12 -12 24 28" width={size} height={size * (28 / 24)} style={style} className={className} aria-hidden>
+  <svg viewBox="-14 -16 28 32" width={size} height={size * (32 / 28)} style={style} className={className} aria-hidden overflow="visible">
     {/* teardrop body — classic map pin silhouette */}
     <path
       d="M 0 14 C -8 4 -10 -2 -10 -4 A 10 10 0 1 1 10 -4 C 10 -2 8 4 0 14 Z"

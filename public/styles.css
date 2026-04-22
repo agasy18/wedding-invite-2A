@@ -247,68 +247,50 @@ body::before {
 
 .scroll-cue {
   position: absolute;
-  bottom: 28px; left: 50%; transform: translateX(-50%);
+  bottom: 24px; left: 50%; transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   font-family: var(--f-arm);
-  font-size: 12px;
-  letter-spacing: 0.32em;
+  font-size: 11px;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--c-wine);
+  color: var(--c-wine-2);
   animation: cue-pulse 2.4s ease-in-out infinite;
 }
 
 @keyframes cue-pulse {
-  0%, 100% { opacity: 0.55; }
-  50%      { opacity: 1; }
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.95; }
 }
 
-/* A fixed "track" line with a bright droplet that travels down it. */
+/* Fixed track with a bright droplet travelling downward. */
 .scroll-line {
   position: relative;
-  width: 2px;
-  height: 48px;
-  background: linear-gradient(var(--c-gold), transparent);
-  opacity: 0.55;
-  border-radius: 1px;
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(var(--c-wine), transparent);
+  opacity: 0.5;
   overflow: hidden;
 }
 .scroll-line::after {
   content: '';
   position: absolute;
   left: 50%;
-  top: -8px;
-  width: 4px;
-  height: 14px;
-  margin-left: -2px;
+  top: -6px;
+  width: 3px;
+  height: 10px;
+  margin-left: -1.5px;
   border-radius: 2px;
   background: var(--c-wine);
-  box-shadow: 0 0 8px rgba(107, 31, 42, 0.4);
   animation: cue-drop 1.8s cubic-bezier(.55,.05,.45,1) infinite;
 }
 @keyframes cue-drop {
   0%   { transform: translateY(0);   opacity: 0; }
   20%  { opacity: 1; }
   80%  { opacity: 1; }
-  100% { transform: translateY(56px); opacity: 0; }
-}
-
-/* Chevron that nods in time with the drop. */
-.scroll-cue::after {
-  content: '';
-  width: 12px;
-  height: 12px;
-  margin-top: -6px;
-  border-right: 2px solid var(--c-wine);
-  border-bottom: 2px solid var(--c-wine);
-  transform: rotate(45deg);
-  animation: cue-chevron 1.8s cubic-bezier(.55,.05,.45,1) infinite;
-}
-@keyframes cue-chevron {
-  0%, 100% { transform: rotate(45deg) translate(-2px, -2px); }
-  50%      { transform: rotate(45deg) translate(2px, 2px); }
+  100% { transform: translateY(38px); opacity: 0; }
 }
 
 /* =========================================================
@@ -1078,7 +1060,16 @@ body::before {
   line-height: 1.7;
   margin: 8px 0;
 }
-.rsvp-sent em { font-family: var(--f-display); font-style: italic; color: var(--c-gold); font-size: 1.15em; }
+.rsvp-sent em {
+  font-family: var(--f-display);
+  font-style: italic;
+  color: var(--c-gold);
+  font-size: 1.15em;
+  line-height: 1.4;
+  display: inline-block;
+  padding: 0 0.05em;
+  vertical-align: baseline;
+}
 .rsvp-sign {
   margin-top: 20px !important;
   font-family: var(--f-display) !important;
