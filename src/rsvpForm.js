@@ -8,11 +8,11 @@
 // `entry.NNNNN=VALUE` pair reveals the entry ID for that field.
 
 export const GOOGLE_FORM = {
-  formId: '1FAIpQLScuXtK4i7NHGJNkOQzm4u0DU5P4Z4tUBoJ0jDC6DphuLA4wWQ',
+  formId: '1FAIpQLSch0x2iAf_NDJf35WoI6UISJFAzrHK4zgFn-3mWSiC5N-FhGQ',
   entryIds: {
-    name: 'entry.1595630117',
-    attending: 'entry.1213503628',
-    guests: 'entry.1304673951',
+    name: 'entry.1082400168',
+    attending: 'entry.1218955300',
+    guests: 'entry.1749638704',
   },
   // These strings must match the option labels in the Google Form exactly.
   attendingOptions: {
