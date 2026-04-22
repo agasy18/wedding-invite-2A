@@ -188,6 +188,18 @@ const App = () => {
               style={{ opacity: trimmedName ? 1 : 0.5, cursor: trimmedName ? 'pointer' : 'not-allowed' }}>
               Բացել նախադիտումը
             </button>
+            {/* Share opens the OS share sheet on mobile, falls back to copying
+                the full invite text on desktop. Either way the guest is added
+                to the local list, same as the Copy button does. */}
+            <button className="btn-share"
+              onClick={() => {
+                saveLocally(name, guests);
+                share({ name, guests });
+              }}
+              disabled={!trimmedName}
+              style={{ opacity: trimmedName ? 1 : 0.5, cursor: trimmedName ? 'pointer' : 'not-allowed' }}>
+              Ուղարկել
+            </button>
           </div>
         </div>
       </div>
@@ -195,7 +207,9 @@ const App = () => {
       <section className="saved-section">
         <div className="saved-header">
           <h3>Ցուցակ · Saved guests</h3>
-          <span className="saved-count">{saved.length} հյուր</span>
+          <span className="saved-count">
+            {saved.reduce((sum, e) => sum + (e.guests || 1), 0)} հյուր · {saved.length} հղում
+          </span>
         </div>
 
         {saved.length === 0 ? (

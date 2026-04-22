@@ -224,7 +224,26 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.saved-actions { display: flex; gap: 6px; }
+.saved-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* On narrow screens, 4 action buttons + name on one row squeezes the name
+   into a couple of letters and an ellipsis. Stack the name above the
+   actions and let the name wrap to multiple lines so the full guest is
+   always readable. */
+@media (max-width: 560px) {
+  .saved-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .saved-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: 18px;
+  }
+  .saved-actions { justify-content: flex-end; }
+}
 .saved-actions button {
   padding: 6px 10px;
   font-family: var(--f-arm);
