@@ -5,6 +5,7 @@ import {
   Rose, Daisy, Cosmos, Cluster, Petal, ArmDivider, Wreath,
 } from './florals.jsx';
 import { pronoun } from './nameCodec.js';
+import { submitRsvp } from './rsvpForm.js';
 
 // --- Helpers ----------------------------------------------------------------
 
@@ -376,20 +377,47 @@ export const VideoSection = () => {
 // --- Section 7: RSVP --------------------------------------------------------
 
 export const RsvpSection = ({ guestName }) => {
-  const [state, setState] = useState('idle'); // idle | form | sent | decline
+  // idle | form | decline | submitting | sent | declined | error
+  const [state, setState] = useState('idle');
   const [guests, setGuests] = useState(1);
   const [burst, setBurst] = useState(false);
+  const [lastAttempt, setLastAttempt] = useState(null); // { attending, guests } for retry
+  const [error, setError] = useState('');
 
-  const confirm = () => {
-    setBurst(true);
-    setTimeout(() => setState('sent'), 400);
-    setTimeout(() => setBurst(false), 4500);
+  const send = async ({ attending, guests: g }) => {
+    setLastAttempt({ attending, guests: g });
+    setError('');
+    setState('submitting');
+    try {
+      await submitRsvp({
+        name: guestName || '',
+        attending,
+        guests: g,
+      });
+      if (attending === 'yes') {
+        setBurst(true);
+        setTimeout(() => setBurst(false), 4500);
+        setState('sent');
+      } else {
+        setState('declined');
+      }
+    } catch (e) {
+      setError(e?.message || 'Network error');
+      setState('error');
+    }
+  };
+
+  const retry = () => {
+    if (lastAttempt) send(lastAttempt);
   };
 
   const you = pronoun(guestName, 'you');
   const your = pronoun(guestName, 'your');
   const youBe = pronoun(guestName, 'youBe');
   const confirmVerb = pronoun(guestName, 'confirm');
+
+  const showForm = state === 'idle' || state === 'form' || state === 'decline'
+    || state === 'submitting' || state === 'error';
 
   return (
     <section className="section rsvp" data-screen-label="07 RSVP">
@@ -400,13 +428,13 @@ export const RsvpSection = ({ guestName }) => {
         <div className="rsvp-flower tl" aria-hidden><Cluster size={80} color="var(--c-peri)" /></div>
         <div className="rsvp-flower br" aria-hidden><Rose size={100} color="var(--c-blush)" /></div>
 
-        {state !== 'sent' && (
+        {showForm && (
           <>
             <div className="rsvp-greeting">
               Սիրելի <em>{guestName || '{ անուն }'}</em>,
             </div>
 
-            {state === 'idle' && (
+            {(state === 'idle' || state === 'error') && (
               <>
                 <p className="rsvp-body">
                   {your} ներկայությունը մեծագույն նվերն է մեզ համար։
@@ -428,7 +456,7 @@ export const RsvpSection = ({ guestName }) => {
                   <span className="stepper-val">{guests}</span>
                   <button onClick={() => setGuests(Math.min(6, guests + 1))}>+</button>
                 </div>
-                <button className="btn-primary" onClick={confirm}>
+                <button className="btn-primary" onClick={() => send({ attending: 'yes', guests })}>
                   Ուղարկել հաստատումը
                 </button>
               </div>
@@ -436,8 +464,30 @@ export const RsvpSection = ({ guestName }) => {
 
             {state === 'decline' && (
               <div className="rsvp-form">
-                <p className="rsvp-body">Շնորհակալություն տեղեկացնելու համար։<br/>Մտովի մեզ հետ կլինեք։</p>
-                <button className="btn-ghost" onClick={() => setState('idle')}>Վերադառնալ</button>
+                <p className="rsvp-body">Կցանկանայի՞ք տեղեկացնել, որ չեք կարող ներկա գտնվել։</p>
+                <button className="btn-primary" onClick={() => send({ attending: 'no' })}>
+                  Ուղարկել
+                </button>
+                <button className="btn-ghost" onClick={() => setState('idle')}>
+                  Վերադառնալ
+                </button>
+              </div>
+            )}
+
+            {state === 'submitting' && (
+              <div className="rsvp-form">
+                <p className="rsvp-body">Ուղարկում ենք…</p>
+              </div>
+            )}
+
+            {state === 'error' && (
+              <div className="rsvp-form" style={{ marginTop: 12 }}>
+                <p className="rsvp-body" style={{ color: 'var(--c-wine)' }}>
+                  Ինչ-որ բան չստացվեց։ Խնդրում ենք փորձել կրկին։
+                </p>
+                {lastAttempt && (
+                  <button className="btn-primary" onClick={retry}>Փորձել կրկին</button>
+                )}
               </div>
             )}
           </>
@@ -450,6 +500,14 @@ export const RsvpSection = ({ guestName }) => {
             </div>
             <h3>Շնորհակալություն 🤍</h3>
             <p>{your} պատասխանը ստացված է։<br/>Ուրախ ենք, որ {youBe} մեզ հետ՝ <em>{guests}</em> հոգով։</p>
+            <p className="rsvp-sign">— Աղասի & Աննա</p>
+          </div>
+        )}
+
+        {state === 'declined' && (
+          <div className="rsvp-sent">
+            <h3>Շնորհակալություն 🤍</h3>
+            <p>Շնորհակալություն տեղեկացնելու համար։<br/>Մտովի մեզ հետ կլինեք։</p>
             <p className="rsvp-sign">— Աղասի & Աննա</p>
           </div>
         )}
