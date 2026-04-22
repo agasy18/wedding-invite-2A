@@ -247,26 +247,68 @@ body::before {
 
 .scroll-cue {
   position: absolute;
-  bottom: 24px; left: 50%; transform: translateX(-50%);
+  bottom: 28px; left: 50%; transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-family: var(--f-arm);
-  font-size: 11px;
-  letter-spacing: 0.3em;
+  font-size: 12px;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--c-wine-2);
-  opacity: 0.6;
+  color: var(--c-wine);
+  animation: cue-pulse 2.4s ease-in-out infinite;
 }
+
+@keyframes cue-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+/* A fixed "track" line with a bright droplet that travels down it. */
 .scroll-line {
-  width: 1px; height: 32px;
-  background: linear-gradient(var(--c-wine), transparent);
-  animation: fall 2.2s ease-in-out infinite;
+  position: relative;
+  width: 2px;
+  height: 48px;
+  background: linear-gradient(var(--c-gold), transparent);
+  opacity: 0.55;
+  border-radius: 1px;
+  overflow: hidden;
 }
-@keyframes fall {
-  0%, 100% { transform: scaleY(0.3); transform-origin: top; }
-  50% { transform: scaleY(1); }
+.scroll-line::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -8px;
+  width: 4px;
+  height: 14px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--c-wine);
+  box-shadow: 0 0 8px rgba(107, 31, 42, 0.4);
+  animation: cue-drop 1.8s cubic-bezier(.55,.05,.45,1) infinite;
+}
+@keyframes cue-drop {
+  0%   { transform: translateY(0);   opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(56px); opacity: 0; }
+}
+
+/* Chevron that nods in time with the drop. */
+.scroll-cue::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  border-right: 2px solid var(--c-wine);
+  border-bottom: 2px solid var(--c-wine);
+  transform: rotate(45deg);
+  animation: cue-chevron 1.8s cubic-bezier(.55,.05,.45,1) infinite;
+}
+@keyframes cue-chevron {
+  0%, 100% { transform: rotate(45deg) translate(-2px, -2px); }
+  50%      { transform: rotate(45deg) translate(2px, 2px); }
 }
 
 /* =========================================================
