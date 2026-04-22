@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
 export default defineConfig({
-  base: '/',
+  base: '/wedding-invite-2A/',
   plugins: [react()],
   build: {
     rollupOptions: {
