@@ -4,8 +4,11 @@ import {
   decodeName,
   isDictionaryHit,
   isPluralGuest,
+  countNameTokens,
   pronoun,
   readGuestNameFromUrl,
+  readGuestCountFromUrl,
+  buildPersonalUrl,
   NAME_TO_ID,
   ID_TO_NAME,
   ALL_NAMES,
@@ -192,6 +195,101 @@ describe('pronoun', () => {
 
   it('treats empty name as singular', () => {
     expect(pronoun('', 'you')).toBe('քեզ');
+  });
+});
+
+describe('countNameTokens', () => {
+  it('returns 0 for empty', () => {
+    expect(countNameTokens('')).toBe(0);
+    expect(countNameTokens('   ')).toBe(0);
+    expect(countNameTokens(null)).toBe(0);
+  });
+
+  it('returns 1 for a single name', () => {
+    expect(countNameTokens('Աղասի')).toBe(1);
+    expect(countNameTokens('Աղասի Աղասյան')).toBe(1); // name + surname still 1 person
+  });
+
+  it('counts parts joined with և', () => {
+    expect(countNameTokens('Աննա և Աստղիկ')).toBe(2);
+    expect(countNameTokens('Ա և Բ և Գ')).toBe(3);
+  });
+
+  it('counts parts joined with ու', () => {
+    expect(countNameTokens('Արամ ու Գոհար')).toBe(2);
+  });
+
+  it('counts comma-separated parts', () => {
+    expect(countNameTokens('Արամ, Գոհար')).toBe(2);
+    expect(countNameTokens('Արամ,Գոհար')).toBe(2);
+    expect(countNameTokens('Ա, Բ, Գ, Դ')).toBe(4);
+  });
+
+  it('counts mixed separators', () => {
+    expect(countNameTokens('Ա, Բ և Գ')).toBe(3);
+  });
+
+  it('ignores empty segments from double separators', () => {
+    expect(countNameTokens('Ա,, Բ')).toBe(2);
+    expect(countNameTokens('Ա,  ,  Բ')).toBe(2);
+  });
+});
+
+describe('readGuestCountFromUrl', () => {
+  it('reads ?g=N', () => {
+    expect(readGuestCountFromUrl('?g=2')).toBe(2);
+    expect(readGuestCountFromUrl('?g=5')).toBe(5);
+  });
+
+  it('returns fallback when ?g= missing', () => {
+    expect(readGuestCountFromUrl('')).toBe(1);
+    expect(readGuestCountFromUrl('?n=m71')).toBe(1);
+    expect(readGuestCountFromUrl('?foo=bar', 3)).toBe(3);
+  });
+
+  it('returns fallback for invalid values', () => {
+    expect(readGuestCountFromUrl('?g=abc')).toBe(1);
+    expect(readGuestCountFromUrl('?g=0')).toBe(1);
+    expect(readGuestCountFromUrl('?g=-2')).toBe(1);
+    expect(readGuestCountFromUrl('?g=', 4)).toBe(4);
+  });
+
+  it('coexists with ?n=', () => {
+    expect(readGuestCountFromUrl('?n=m71&g=2')).toBe(2);
+  });
+});
+
+describe('buildPersonalUrl', () => {
+  const base = 'https://example.com/wedding/';
+
+  it('includes ?n= for non-empty names', () => {
+    expect(buildPersonalUrl({ baseUrl: base, name: 'Աղասի', guests: 1 }))
+      .toBe('https://example.com/wedding/?n=m71');
+  });
+
+  it('omits ?g= when guests=1', () => {
+    const url = buildPersonalUrl({ baseUrl: base, name: 'Աղասի', guests: 1 });
+    expect(url).not.toContain('g=');
+  });
+
+  it('includes ?g= when guests>1', () => {
+    expect(buildPersonalUrl({ baseUrl: base, name: 'Աղասի', guests: 3 }))
+      .toBe('https://example.com/wedding/?n=m71&g=3');
+  });
+
+  it('omits ?n= for empty name', () => {
+    const url = buildPersonalUrl({ baseUrl: base, name: '', guests: 2 });
+    expect(url).toBe('https://example.com/wedding/?g=2');
+  });
+
+  it('returns the bare base URL when both are empty/default', () => {
+    expect(buildPersonalUrl({ baseUrl: base, name: '', guests: 1 }))
+      .toBe('https://example.com/wedding/');
+  });
+
+  it('uses multi-token encoding for couple names', () => {
+    const url = buildPersonalUrl({ baseUrl: base, name: 'Աննա և Աստղիկ', guests: 2 });
+    expect(url).toBe('https://example.com/wedding/?n=m.f88..1f7&g=2');
   });
 });
 

@@ -176,6 +176,29 @@ export function readGuestNameFromUrl(search = window.location.search) {
   return q.get('name') ?? '';
 }
 
+// Read `?g=N` (guest count) from the URL. Returns a positive integer, or
+// the supplied fallback if missing/invalid.
+export function readGuestCountFromUrl(search = window.location.search, fallback = 1) {
+  const q = new URLSearchParams(search);
+  const raw = q.get('g');
+  if (raw == null) return fallback;
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+// Build a personalized invite URL.
+// - `baseUrl`: origin + pathname of the invite (e.g. "https://.../wedding-invite-2A/")
+// - `name`: raw guest name. Gets encoded via encodeName.
+// - `guests`: integer >= 1. Omitted from the URL when equal to 1 (smallest URL).
+export function buildPersonalUrl({ baseUrl, name, guests }) {
+  const url = new URL(baseUrl);
+  const trimmed = (name ?? '').trim();
+  if (trimmed) url.searchParams.set('n', encodeName(trimmed));
+  const g = parseInt(guests, 10);
+  if (Number.isFinite(g) && g > 1) url.searchParams.set('g', String(g));
+  return url.toString();
+}
+
 // Is the guest "name" actually multiple people? If so use the formal/plural
 // pronoun (Ձեզ/Ձեր), otherwise the familiar singular (քեզ/քո).
 // Markers for multiple: ` և `, ` ու ` (with spaces), or a comma.
@@ -186,6 +209,24 @@ export function isPluralGuest(name) {
   // Match " և " and " ու " — the spaces prevent false positives on names that
   // happen to end/start with these letter sequences.
   return / և | ու /.test(s);
+}
+
+// Count how many distinct guests a name represents, based on the same
+// separator markers as isPluralGuest. Used by the builder to auto-suggest
+// a guest count from a typed name. The invite itself never calls this —
+// it reads the `g` URL parameter verbatim.
+//
+// Empty name → 0. Single name → 1. "A և B" → 2. "A, B, C" → 3.
+export function countNameTokens(name) {
+  const s = (name ?? '').trim();
+  if (!s) return 0;
+  // Split on any of the three separators. We normalize by replacing each
+  // with a single sentinel, then splitting once.
+  const parts = s
+    .split(/ և | ու |\s*,\s*/)
+    .map(p => p.trim())
+    .filter(Boolean);
+  return Math.max(1, parts.length);
 }
 
 // Convenience: return the right pronoun form for a given name.

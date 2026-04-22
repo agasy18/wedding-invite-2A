@@ -376,10 +376,10 @@ export const VideoSection = () => {
 
 // --- Section 7: RSVP --------------------------------------------------------
 
-export const RsvpSection = ({ guestName }) => {
+export const RsvpSection = ({ guestName, defaultGuests = 1 }) => {
   // idle | form | decline | submitting | sent | declined | error
   const [state, setState] = useState('idle');
-  const [guests, setGuests] = useState(1);
+  const [guests, setGuests] = useState(defaultGuests);
   const [burst, setBurst] = useState(false);
   const [lastAttempt, setLastAttempt] = useState(null); // { attending, guests } for retry
   const [error, setError] = useState('');

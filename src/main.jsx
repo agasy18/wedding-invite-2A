@@ -6,7 +6,7 @@ import {
   HeroSection, CountdownSection, ScheduleSection, VenuesSection,
   GallerySection, VideoSection, RsvpSection,
 } from './sections.jsx';
-import { readGuestNameFromUrl } from './nameCodec.js';
+import { readGuestNameFromUrl, readGuestCountFromUrl } from './nameCodec.js';
 
 const NavDots = ({ sections, active, onGo }) => (
   <nav className="nav-dots" aria-label="sections">
@@ -32,6 +32,7 @@ const App = () => {
   const [active, setActive] = useState(0);
 
   const guestName = useMemo(() => readGuestNameFromUrl(), []);
+  const defaultGuests = useMemo(() => readGuestCountFromUrl(), []);
 
   useEffect(() => {
     document.documentElement.dataset.density = 'whisper';
@@ -66,7 +67,7 @@ const App = () => {
       <div id="countdown"><CountdownSection /></div>
       <div id="schedule"><ScheduleSection /></div>
       <div id="gallery"><GallerySection /></div>
-      <div id="rsvp"><RsvpSection guestName={guestName} /></div>
+      <div id="rsvp"><RsvpSection guestName={guestName} defaultGuests={defaultGuests} /></div>
 
       <NavDots sections={sectionDefs} active={active} onGo={goTo} />
     </div>
