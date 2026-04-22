@@ -949,7 +949,9 @@ body::before {
 .vp-play:hover { transform: translate(-50%, -50%) scale(1.08); }
 .vp-play:focus-visible { outline: 2px solid var(--c-gold); outline-offset: 4px; border-radius: 50%; }
 
-.vp.vp-started.vp-playing.vp-chrome-hidden .vp-play {
+/* Hide the big center button the moment playback starts — we don't want it
+   sitting over the video. It comes back when the user pauses. */
+.vp.vp-playing .vp-play {
   opacity: 0;
   pointer-events: none;
 }
