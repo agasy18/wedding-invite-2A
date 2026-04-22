@@ -1,6 +1,8 @@
 node_modules
 dist
 .vite
+# Local video files — swapped for CDN URLs in src/videoConfig.js for production
+public/video/
 .DS_Store
 *.log
 .env
