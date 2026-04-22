@@ -411,7 +411,87 @@ body::before {
    Section 3 — Schedule
    ========================================================= */
 
-.schedule { background: var(--c-paper); }
+.schedule {
+  background: var(--c-paper);
+  position: relative;
+  isolation: isolate;            /* keeps backdrop filters/blend local */
+  overflow: hidden;              /* clip Ken Burns zoom overshoot */
+}
+
+/* Diagonal feathered reveal ------------------------------------------------
+   No clip-path — a single linear mask gradient does both the shaping AND
+   the feathering in one pass. The gradient runs along the diagonal: fully
+   transparent in the top-left, full band of fade, fully opaque in the
+   bottom-right corner. Result reads as a soft triangle. */
+.agenda-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  /* Single vertical gradient: photo is fully opaque at the bottom, fades
+     gently to transparent near the top. Keeps the photo visible as a
+     foundation along the bottom edge. */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 10%, rgba(0,0,0,1) 60%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 10%, rgba(0,0,0,1) 60%);
+}
+
+.agenda-bg-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.08) translate(var(--pan-x, 0), var(--pan-y, 0));
+  transition: opacity 1.8s ease-in-out;
+  will-change: opacity, transform;
+}
+
+.agenda-bg-slide.active {
+  /* Photo is decorative, not content — keep it at low opacity so text
+     on top stays clearly readable. */
+  opacity: 0.3;
+  animation: agenda-kb 12s ease-in-out forwards;
+}
+
+@keyframes agenda-kb {
+  0%   { transform: scale(1.02) translate(0, 0); }
+  100% { transform: scale(1.14) translate(var(--pan-x, 0), var(--pan-y, 0)); }
+}
+
+/* Cream wash — lifts the photo toward the paper palette instead of
+   darkening it (a multiply blend made text unreadable). Normal blend
+   keeps the photo's midtones but softens its saturation and contrast. */
+.agenda-bg-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(253, 249, 241, 0.55) 0%, rgba(253, 249, 241, 0.2) 60%, rgba(246, 237, 221, 0.3) 100%);
+  pointer-events: none;
+}
+
+.schedule > *:not(.agenda-bg) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Agenda content wrapper — just centers content and holds it above the
+   corner photo. No card chrome; the photo is a decoration, not a full
+   backdrop, so the content stays on the normal paper background. */
+.schedule-card {
+  position: relative;
+  width: min(560px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agenda-bg-slide.active { animation: none; transform: scale(1); }
+  .agenda-bg-slide { transition-duration: 0.4s; }
+}
 
 .sched-rail {
   position: relative;

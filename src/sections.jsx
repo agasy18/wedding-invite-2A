@@ -7,6 +7,7 @@ import {
 import { pronoun } from './nameCodec.js';
 import { submitRsvp } from './rsvpForm.js';
 import { VideoPlayer } from './VideoPlayer.jsx';
+import { AgendaBackdrop } from './AgendaBackdrop.jsx';
 
 // --- Helpers ----------------------------------------------------------------
 
@@ -229,34 +230,37 @@ export const ScheduleSection = () => {
   ];
   return (
     <section className="section schedule" data-screen-label="03 Schedule">
-      <Reveal><div className="section-kicker"><ArmDivider width={80} /></div></Reveal>
-      <Reveal delay={100}>
-        <h2 className="section-title">Օրակարգ</h2>
-        <p className="section-sub">06 Սեպտեմբերի 2026</p>
-      </Reveal>
+      <AgendaBackdrop />
+      <div className="schedule-card">
+        <Reveal><div className="section-kicker"><ArmDivider width={80} /></div></Reveal>
+        <Reveal delay={100}>
+          <h2 className="section-title">Օրակարգ</h2>
+          <p className="section-sub">06 Սեպտեմբերի 2026</p>
+        </Reveal>
 
-      <div className="story-rail">
-        <div className="story-line" />
-        {items.map((it, i) => (
-          <Reveal key={i} delay={280 + i * 220} className="story-step" as="div">
-            <div className="story-medallion" aria-hidden>{it.flower}</div>
-            <div className="story-step-body">
-              <div className="story-time">{it.time}</div>
-              <div className="story-title-line">{it.title}</div>
-              {it.venue && <div className="story-venue">{it.venue}</div>}
-              {it.addr && <div className="story-addr">{it.addr}</div>}
-              {it.mapLinks && it.mapLinks.length > 0 && (
-                <div className="story-cta-row">
-                  {it.mapLinks.map(m => (
-                    <a key={m.url} className="story-cta" href={m.url} target="_blank" rel="noopener">
-                      <FloralPin size={14} /> {m.label}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          </Reveal>
-        ))}
+        <div className="story-rail">
+          <div className="story-line" />
+          {items.map((it, i) => (
+            <Reveal key={i} delay={280 + i * 220} className="story-step" as="div">
+              <div className="story-medallion" aria-hidden>{it.flower}</div>
+              <div className="story-step-body">
+                <div className="story-time">{it.time}</div>
+                <div className="story-title-line">{it.title}</div>
+                {it.venue && <div className="story-venue">{it.venue}</div>}
+                {it.addr && <div className="story-addr">{it.addr}</div>}
+                {it.mapLinks && it.mapLinks.length > 0 && (
+                  <div className="story-cta-row">
+                    {it.mapLinks.map(m => (
+                      <a key={m.url} className="story-cta" href={m.url} target="_blank" rel="noopener">
+                        <FloralPin size={14} /> {m.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );
