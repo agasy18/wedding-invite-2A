@@ -275,6 +275,24 @@ body::before {
   50%      { opacity: 0.95; }
 }
 
+/* After a few idle seconds on the hero the cue starts bouncing to draw
+   attention downward. JS adds `.nudge` to kick it off and removes it once
+   the user begins scrolling. */
+.scroll-cue.nudge {
+  color: var(--c-wine);
+  animation: cue-bounce 1s cubic-bezier(.5,0,.5,1) infinite;
+}
+@keyframes cue-bounce {
+  0%   { transform: translateX(-50%) translateY(0);    opacity: 0.75; }
+  40%  { transform: translateX(-50%) translateY(-14px); opacity: 1; }
+  60%  { transform: translateX(-50%) translateY(-10px); opacity: 1; }
+  80%  { transform: translateX(-50%) translateY(-2px);  opacity: 0.9; }
+  100% { transform: translateX(-50%) translateY(0);    opacity: 0.75; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue.nudge { animation: none; color: var(--c-wine); }
+}
+
 /* Fixed track with a bright droplet travelling downward. */
 .scroll-line {
   position: relative;

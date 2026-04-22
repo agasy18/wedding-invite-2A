@@ -58,6 +58,42 @@ const App = () => {
     if (el) window.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
   };
 
+  // If the visitor hasn't scrolled after 5 seconds, add a `.nudge` class to
+  // the hero's scroll cue so it starts bouncing. Remove it the moment they
+  // start scrolling — we only want to prod idle users.
+  useEffect(() => {
+    let idleTimer;
+    let cue;
+
+    const start = () => {
+      cue = document.querySelector('.scroll-cue');
+      if (cue) cue.classList.add('nudge');
+    };
+    const stop = () => {
+      if (cue) cue.classList.remove('nudge');
+      clearTimeout(idleTimer);
+      window.removeEventListener('scroll', onScroll, { passive: true });
+      window.removeEventListener('wheel', onScroll, { passive: true });
+      window.removeEventListener('touchmove', onScroll, { passive: true });
+      window.removeEventListener('keydown', onScroll);
+    };
+    const onScroll = () => stop();
+
+    idleTimer = setTimeout(start, 5000);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('wheel', onScroll, { passive: true });
+    window.addEventListener('touchmove', onScroll, { passive: true });
+    window.addEventListener('keydown', onScroll);
+
+    return () => {
+      clearTimeout(idleTimer);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('wheel', onScroll);
+      window.removeEventListener('touchmove', onScroll);
+      window.removeEventListener('keydown', onScroll);
+    };
+  }, []);
+
   return (
     <div className="app">
       <FloralDefs />
