@@ -88,17 +88,20 @@ const App = () => {
     }
   };
 
-  const add = () => {
-    const n = name.trim();
-    if (!n) return;
-    if (saved.some(s => s.name === n)) {
-      showToast('Արդեն ավելացված է');
-      setName('');
-      return;
-    }
-    setSaved([{ name: n, guests }, ...saved]);
-    setName('');
-    showToast(`«${n}» ավելացված է`);
+  // Persist a guest to localStorage silently. Used by the Copy button so
+  // every copied link automatically lands in the saved list. If the name is
+  // already saved, update its guest count in case it changed.
+  const saveLocally = (n, g) => {
+    const trimmed = n.trim();
+    if (!trimmed) return;
+    setSaved(prev => {
+      const existing = prev.findIndex(s => s.name === trimmed);
+      if (existing === -1) return [{ name: trimmed, guests: g }, ...prev];
+      if (prev[existing].guests === g) return prev; // no change, skip re-render
+      const copy = prev.slice();
+      copy[existing] = { name: trimmed, guests: g };
+      return copy;
+    });
   };
 
   const remove = (n) => {
@@ -167,7 +170,10 @@ const App = () => {
               {guests > 1 && <>&amp;g=<span className="hl">{guests}</span></>}
             </code>
             <button className={`copy-btn ${copied ? 'copied' : ''}`}
-              onClick={() => copy(fullUrl(name, guests), true)}
+              onClick={() => {
+                saveLocally(name, guests);
+                copy(fullUrl(name, guests), true);
+              }}
               disabled={!trimmedName}
               style={{ opacity: trimmedName ? 1 : 0.5, cursor: trimmedName ? 'pointer' : 'not-allowed' }}>
               {copied ? '✓ Պատճենված' : 'Պատճենել'}
