@@ -2,6 +2,11 @@
 
 Single-page Armenian wedding invitation built with Vite + React. Includes a companion guest-link builder. Hosted on GitHub Pages.
 
+## Production
+
+- **Invite**: <https://agasy18.github.io/wedding-invite-2A/>
+- **Builder** (internal): <https://agasy18.github.io/wedding-invite-2A/builder.html>
+
 ## Files
 
 ```
