@@ -111,7 +111,7 @@ export const HeroSection = ({ guestName }) => {
 // --- Section 2: Countdown ---------------------------------------------------
 
 export const CountdownSection = () => {
-  const target = useMemo(() => new Date('2026-09-06T16:00:00+04:00').getTime(), []);
+  const target = useMemo(() => new Date('2026-09-06T15:30:00+04:00').getTime(), []);
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -203,7 +203,7 @@ const TickDigit = ({ digit }) => {
 export const ScheduleSection = () => {
   const items = [
     {
-      time: '16:00',
+      time: '15:30',
       title: 'Պսակադրություն',
       venue: 'Հովհաննավանք',
       addr: 'Օհանավան, Արագածոտնի մարզ',
