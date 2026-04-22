@@ -14,6 +14,9 @@ function formatTime(sec) {
 export const VideoPlayer = () => {
   const videoRef = useRef(null);
   const hideTimerRef = useRef(null);
+  // Remembers whether the video was playing right before we auto-paused it on
+  // scroll-out, so we can resume when the user scrolls back in.
+  const wasPlayingRef = useRef(false);
   const [started, setStarted] = useState(false);   // true after first play
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -21,6 +24,30 @@ export const VideoPlayer = () => {
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
   const [chromeVisible, setChromeVisible] = useState(true);
+
+  // Auto-pause when the video slide scrolls out of view; auto-resume when it
+  // comes back — but only if the user had it playing before (never start
+  // uninvited).
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          if (wasPlayingRef.current) v.play().catch(() => {});
+        } else {
+          if (!v.paused) {
+            wasPlayingRef.current = true;
+            v.pause();
+          } else {
+            wasPlayingRef.current = false;
+          }
+        }
+      });
+    }, { threshold: 0.5 });
+    obs.observe(v);
+    return () => obs.disconnect();
+  }, []);
 
   // Hide controls 2s after the user stops interacting *while playing*.
   const armHide = () => {
