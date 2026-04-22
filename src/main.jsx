@@ -99,7 +99,7 @@ const App = () => {
       <FloralDefs />
 
       <div id="hero"><HeroSection guestName={guestName} /></div>
-      <div id="video"><VideoSection /></div>
+      <div id="video"><VideoSection guestName={guestName} /></div>
       <div id="countdown"><CountdownSection /></div>
       <div id="schedule"><ScheduleSection /></div>
       <div id="gallery"><GallerySection /></div>

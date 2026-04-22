@@ -899,10 +899,11 @@ body::before {
 
 .video-frame {
   position: relative;
-  width: min(400px, 90vw);
+  /* Width tied to height so the 9:16 frame fills as much of the slide as
+     possible without overflowing. `52dvh` at 9:16 gives height ≈ 92dvh. */
+  width: min(520px, 95vw, 52dvh);
   aspect-ratio: 9/16;
-  max-height: 80dvh;
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 .video-flower { position: absolute; z-index: 3; pointer-events: none; }
