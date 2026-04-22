@@ -37,6 +37,9 @@ export const VideoPlayer = () => {
 
   const onPlay = () => setPlaying(true);
   const onPause = () => setPlaying(false);
+  // With `loop` the native video element seeks back to 0 and keeps playing
+  // without firing `ended`. The handler is kept as a safety net in case the
+  // user disables looping later.
   const onEnded = () => { setPlaying(false); setStarted(false); };
   const onTimeUpdate = () => {
     const v = videoRef.current;
@@ -94,6 +97,7 @@ export const VideoPlayer = () => {
         className="vp-video"
         playsInline
         preload="auto"
+        loop
         poster={VIDEO_POSTER}
         onPlay={onPlay}
         onPause={onPause}
