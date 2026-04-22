@@ -395,7 +395,6 @@ export const RsvpSection = ({ guestName }) => {
     <section className="section rsvp" data-screen-label="07 RSVP">
       <Reveal><div className="section-kicker"><ArmDivider width={80} /></div></Reveal>
       <Reveal delay={100}><h2 className="section-title">{confirmVerb} {your} մասնակցությունը</h2></Reveal>
-      <Reveal delay={200}><p className="section-sub">Խնդրում ենք պատասխանել մինչև 15 Օգոստոս</p></Reveal>
 
       <div className="rsvp-card">
         <div className="rsvp-flower tl" aria-hidden><Cluster size={80} color="var(--c-peri)" /></div>
