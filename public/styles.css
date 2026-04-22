@@ -443,7 +443,7 @@ body::before {
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0;
-  transform: scale(1.08) translate(var(--pan-x, 0), var(--pan-y, 0));
+  transform: scale(1.02);
   transition: opacity 1.8s ease-in-out;
   will-change: opacity, transform;
 }
@@ -452,12 +452,20 @@ body::before {
   /* Photo is decorative, not content — keep it at low opacity so text
      on top stays clearly readable. */
   opacity: 0.3;
-  animation: agenda-kb 12s ease-in-out forwards;
+  /* Animation duration slightly LONGER than the JS cross-fade interval
+     (7s) so the slide is replaced before the zoom ever hits its ease-out
+     tail. That keeps the motion smooth and guarantees no visible "jump"
+     back to scale 1.02 at the end of a cycle. */
+  animation: agenda-kb 9s linear forwards;
 }
 
 @keyframes agenda-kb {
-  0%   { transform: scale(1.02) translate(0, 0); }
-  100% { transform: scale(1.14) translate(var(--pan-x, 0), var(--pan-y, 0)); }
+  /* Linear, monotonic zoom-in over the whole visible window — no pan.
+     Pan was the source of the "shake": each slide has its own random
+     target offset, so handoff between slides flicked the image. Pure
+     zoom feels like a Ken Burns still without the twitch. */
+  0%   { transform: scale(1.02); }
+  100% { transform: scale(1.14); }
 }
 
 /* Cream wash — lifts the photo toward the paper palette instead of

@@ -4,7 +4,7 @@
 // scrim on top keeps text comfortably readable. Images rotate on a timer;
 // when the user leaves the section it pauses (no wasted battery).
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -53,33 +53,15 @@ export const AgendaBackdrop = () => {
     next.src = BASE + IMAGES[(index + 1) % IMAGES.length].src;
   }, [index]);
 
-  const pans = useMemo(() => IMAGES.map((_, i) => {
-    // Deterministic pan per slot so it doesn't flicker every render.
-    const seed = i * 1.618;
-    const x = (Math.sin(seed) * 6).toFixed(1);        // -6..6%
-    const y = (Math.cos(seed * 1.3) * 5).toFixed(1);  // -5..5%
-    return { x, y };
-  }), []);
-
   return (
     <div className="agenda-bg" ref={ref} aria-hidden>
-      {IMAGES.map((img, i) => {
-        const isActive = i === index;
-        const { x, y } = pans[i];
-        return (
-          <div
-            key={img.src}
-            className={`agenda-bg-slide ${isActive ? 'active' : ''}`}
-            style={{
-              backgroundImage: `url(${BASE}${img.src})`,
-              // Each slide slow-zooms while visible. Base scale 1.08 so the
-              // pan never reveals empty edges.
-              '--pan-x': `${x}%`,
-              '--pan-y': `${y}%`,
-            }}
-          />
-        );
-      })}
+      {IMAGES.map((img, i) => (
+        <div
+          key={img.src}
+          className={`agenda-bg-slide ${i === index ? 'active' : ''}`}
+          style={{ backgroundImage: `url(${BASE}${img.src})` }}
+        />
+      ))}
       <div className="agenda-bg-scrim" />
     </div>
   );
