@@ -139,7 +139,6 @@ const App = () => {
             className="name-input"
             value={name}
             onChange={e => onNameChange(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') add(); }}
             placeholder="Արմեն Հակոբյան"
             autoFocus
           />
@@ -181,10 +180,6 @@ const App = () => {
               disabled={!trimmedName}
               style={{ opacity: trimmedName ? 1 : 0.5, cursor: trimmedName ? 'pointer' : 'not-allowed' }}>
               Բացել նախադիտումը
-            </button>
-            <button className="btn-share" onClick={add} disabled={!trimmedName}
-              style={{ opacity: trimmedName ? 1 : 0.5, cursor: trimmedName ? 'pointer' : 'not-allowed' }}>
-              + Ավելացնել ցուցակին
             </button>
           </div>
         </div>
