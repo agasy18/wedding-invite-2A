@@ -8,6 +8,15 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Prefetch the invite video + poster so they're warm in cache
+         before the user scrolls to the video slide. -->
+    <link rel="preload" as="image" href="%BASE_URL%video/invite.poster.jpg" fetchpriority="high" />
+    <!-- HEVC is the primary; prefetching only it avoids wasting bandwidth on
+         the H.264 fallback that the same browser would never use. Browsers
+         that can't decode HEVC simply fetch H.264 when the <video> element
+         mounts — slightly later but the tradeoff favours the 85%+ on HEVC. -->
+    <link rel="prefetch" as="video" href="%BASE_URL%video/invite.hevc.mp4" type='video/mp4; codecs="hvc1"' />
     <link
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Italiana&family=Noto+Serif+Armenian:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap"
       rel="stylesheet"

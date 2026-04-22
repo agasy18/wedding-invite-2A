@@ -93,7 +93,7 @@ export const VideoPlayer = () => {
         ref={videoRef}
         className="vp-video"
         playsInline
-        preload="metadata"
+        preload="auto"
         poster={VIDEO_POSTER}
         onPlay={onPlay}
         onPause={onPause}
