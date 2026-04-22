@@ -6,6 +6,7 @@ import {
 } from './florals.jsx';
 import { pronoun } from './nameCodec.js';
 import { submitRsvp } from './rsvpForm.js';
+import { VIDEO_SOURCES } from './videoConfig.js';
 
 // --- Helpers ----------------------------------------------------------------
 
@@ -367,26 +368,23 @@ export const GallerySection = () => {
 // --- Section 6: Video -------------------------------------------------------
 
 export const VideoSection = ({ guestName }) => {
-  const [playing, setPlaying] = useState(false);
   const you = pronoun(guestName, 'you');
   return (
     <section className="section video" data-screen-label="06 Video">
       <Reveal className="video-frame" as="div">
         <div className="video-flower tl" aria-hidden><Rose size={90} color="var(--c-blush)" /></div>
         <div className="video-flower br" aria-hidden><Cosmos size={70} color="var(--c-coral)" /></div>
-        <div className={`video-placeholder ${playing ? 'playing' : ''}`}
-             onClick={() => setPlaying(!playing)} role="button" tabIndex={0}>
-          <div className="video-stripes" aria-hidden />
-          <div className="video-label">STORY VIDEO</div>
-          <button className="play-btn" aria-label="play">
-            <svg viewBox="0 0 64 64" width="64" height="64">
-              <circle cx="32" cy="32" r="30" fill="rgba(251,245,236,0.95)" stroke="var(--c-wine)" strokeWidth="1.5" />
-              <path d={playing ? 'M 24 22 L 24 42 M 40 22 L 40 42' : 'M 26 20 L 46 32 L 26 44 Z'}
-                    stroke="var(--c-wine)" strokeWidth={playing ? 3 : 0}
-                    fill={playing ? 'none' : 'var(--c-wine)'} strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
+        <video
+          className="video-player"
+          controls
+          playsInline
+          preload="metadata"
+        >
+          {VIDEO_SOURCES.map(s => (
+            <source key={s.src} src={s.src} type={s.type} />
+          ))}
+          Your browser does not support this video.
+        </video>
       </Reveal>
 
       <Reveal delay={220}>
