@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Rose, Daisy, Cosmos, Cluster, Petal, ArmDivider, Wreath,
 } from './florals.jsx';
+import { pronoun } from './nameCodec.js';
 
 // --- Helpers ----------------------------------------------------------------
 
@@ -74,7 +75,7 @@ export const HeroSection = ({ guestName }) => {
 
           <Reveal delay={450}>
             <p className="hero-invite">
-              Սիրով հրավիրում ենք Ձեզ<br/>մեր հարսանյաց արարողությանը
+              Սիրով հրավիրում ենք {pronoun(guestName, 'you')}<br/>մեր հարսանյաց արարողությանը
             </p>
           </Reveal>
 
@@ -385,10 +386,15 @@ export const RsvpSection = ({ guestName }) => {
     setTimeout(() => setBurst(false), 4500);
   };
 
+  const you = pronoun(guestName, 'you');
+  const your = pronoun(guestName, 'your');
+  const youBe = pronoun(guestName, 'youBe');
+  const confirmVerb = pronoun(guestName, 'confirm');
+
   return (
     <section className="section rsvp" data-screen-label="07 RSVP">
       <Reveal><div className="section-kicker"><ArmDivider width={80} /></div></Reveal>
-      <Reveal delay={100}><h2 className="section-title">Հաստատեք Ձեր մասնակցությունը</h2></Reveal>
+      <Reveal delay={100}><h2 className="section-title">{confirmVerb} {your} մասնակցությունը</h2></Reveal>
       <Reveal delay={200}><p className="section-sub">Խնդրում ենք պատասխանել մինչև 15 Օգոստոս</p></Reveal>
 
       <div className="rsvp-card">
@@ -404,7 +410,7 @@ export const RsvpSection = ({ guestName }) => {
             {state === 'idle' && (
               <>
                 <p className="rsvp-body">
-                  Ձեր ներկայությունը մեծագույն նվերն է մեզ համար։
+                  {your} ներկայությունը մեծագույն նվերն է մեզ համար։
                 </p>
                 <button className="btn-primary" onClick={() => setState('form')}>
                   Հաստատել մասնակցությունը
@@ -444,7 +450,7 @@ export const RsvpSection = ({ guestName }) => {
               <Rose size={120} color="var(--c-blush)" />
             </div>
             <h3>Շնորհակալություն 🤍</h3>
-            <p>Ձեր պատասխանը ստացված է։<br/>Ուրախ ենք, որ կլինեք մեզ հետ՝ <em>{guests}</em> հոգով։</p>
+            <p>{your} պատասխանը ստացված է։<br/>Ուրախ ենք, որ {youBe} մեզ հետ՝ <em>{guests}</em> հոգով։</p>
             <p className="rsvp-sign">— Աղասի & Աննա</p>
           </div>
         )}

@@ -104,3 +104,29 @@ export function readGuestNameFromUrl(search = window.location.search) {
   if (n) return decodeName(n);
   return q.get('name') ?? '';
 }
+
+// Is the guest "name" actually multiple people? If so use the formal/plural
+// pronoun (Ձեզ/Ձեր), otherwise the familiar singular (քեզ/քո).
+// Markers for multiple: ` և `, ` ու ` (with spaces), or a comma.
+export function isPluralGuest(name) {
+  const s = (name ?? '').trim();
+  if (!s) return false;
+  if (s.includes(',')) return true;
+  // Match " և " and " ու " — the spaces prevent false positives on names that
+  // happen to end/start with these letter sequences.
+  return / և | ու /.test(s);
+}
+
+// Convenience: return the right pronoun form for a given name.
+export const PRONOUNS = {
+  you:   { singular: 'քեզ',  plural: 'Ձեզ' },   // accusative ("invite you")
+  your:  { singular: 'քո',   plural: 'Ձեր' },   // possessive ("your presence")
+  youBe: { singular: 'կլինես', plural: 'կլինեք' }, // "you will be"
+  confirm: { singular: 'Հաստատիր', plural: 'Հաստատեք' }, // imperative
+};
+
+export function pronoun(name, key) {
+  const form = PRONOUNS[key];
+  if (!form) return '';
+  return isPluralGuest(name) ? form.plural : form.singular;
+}
