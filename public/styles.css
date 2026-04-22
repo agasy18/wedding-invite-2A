@@ -871,8 +871,9 @@ body::before {
 
 .video-frame {
   position: relative;
-  width: min(900px, 100%);
-  aspect-ratio: 16/9;
+  width: min(400px, 90vw);
+  aspect-ratio: 9/16;
+  max-height: 80vh;
   margin-top: 24px;
 }
 
