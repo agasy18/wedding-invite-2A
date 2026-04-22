@@ -835,62 +835,138 @@ body::before {
 
 .gallery { background: var(--c-paper); }
 
-.gallery-grid {
-  position: relative;
+/* Gallery breaks the one-viewport snap rule — this slide grows to fit all
+   photos and the user scrolls through them inside the section. scroll-snap
+   still aligns to `start` when they scroll into the next slide.
+   `justify-content: flex-start` so content starts at the top instead of
+   vertically centering (which would hide the heading off-screen). */
+.gallery.section {
+  min-height: auto;
+  justify-content: flex-start;
+  padding-bottom: clamp(80px, 10vw, 120px);
+}
+
+/* Mosaic grid — 4 columns on mobile, 6 on desktop. `dense` packing lets
+   the grid slot smaller tiles into gaps left by larger spans, so the
+   composition never leaves empty slots. */
+.gallery-mosaic {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: clamp(8px, 1.5vw, 16px);
-  width: min(1000px, 100%);
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(100px, 24vw);
+  grid-auto-flow: dense;
+  gap: clamp(6px, 1.5vw, 12px);
+  width: min(860px, 100%);
   margin-top: 24px;
 }
 
-.g-item { margin: 0; }
-.g-item { grid-column: span 3; aspect-ratio: 4/5; }
-.g-0 { grid-column: span 6; aspect-ratio: 16/10; }
-.g-1 { grid-column: span 3; aspect-ratio: 1/1; }
-.g-2 { grid-column: span 3; aspect-ratio: 1/1; }
-.g-3 { grid-column: span 2; aspect-ratio: 3/4; }
-.g-4 { grid-column: span 2; aspect-ratio: 3/4; }
-.g-5 { grid-column: span 2; aspect-ratio: 3/4; }
-
-@media (max-width: 640px) {
-  .g-item, .g-0, .g-1, .g-2, .g-3, .g-4, .g-5 { grid-column: span 6; aspect-ratio: 4/3; }
-  .g-0 { aspect-ratio: 16/10; }
+@media (min-width: 720px) {
+  .gallery-mosaic {
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: minmax(120px, 12vw);
+  }
 }
 
-.g-placeholder {
-  position: relative;
+.gm-item {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+  overflow: hidden;
+  border-radius: 3px;
+  box-shadow: 0 6px 18px rgba(107,31,42,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.gm-item:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(107,31,42,0.12); }
+.gm-item:focus-visible { outline: 2px solid var(--c-gold); outline-offset: 3px; }
+
+.gm-img {
+  display: block;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  border-radius: 2px;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.4s ease;
+}
+.gm-item:hover .gm-img { transform: scale(1.04); }
+
+/* Mosaic spans — variety for visual rhythm. The grid container uses
+   grid-auto-flow: dense so smaller tiles backfill gaps left by larger
+   spans, which means the layout stays hole-free even with irregular
+   span sizes. Photos center-crop via object-fit: cover. */
+.span-1    { grid-column: span 2; grid-row: span 2; }  /* square tile        */
+.span-wide { grid-column: span 4; grid-row: span 2; }  /* landscape banner   */
+.span-tall { grid-column: span 2; grid-row: span 3; }  /* tall portrait      */
+.span-hero { grid-column: span 4; grid-row: span 3; }  /* full-width anchor  */
+
+@media (min-width: 720px) {
+  /* Desktop 6-col: hero tiles become 3 wide instead of 4, keeping them
+     prominent without dominating the viewport. */
+  .span-1    { grid-column: span 2; grid-row: span 2; }
+  .span-wide { grid-column: span 4; grid-row: span 2; }
+  .span-tall { grid-column: span 2; grid-row: span 3; }
+  .span-hero { grid-column: span 3; grid-row: span 3; }
+}
+
+/* Lightbox overlay */
+.gm-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(20, 10, 15, 0.9);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: lb-fade 0.25s ease-out;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
-
-.g-stripes {
-  position: absolute; inset: 0;
-  background:
-    repeating-linear-gradient(45deg, rgba(255,255,255,0.18) 0 8px, transparent 8px 20px);
-  pointer-events: none;
+@keyframes lb-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
-
-.g-label {
-  position: relative;
-  font-family: var(--f-mono);
-  font-size: 10px;
-  letter-spacing: 0.25em;
-  color: rgba(107,31,42,0.55);
-  padding: 6px 12px;
-  background: rgba(251,245,236,0.7);
-  border-radius: 1px;
+.gm-lightbox-img {
+  max-width: 92vw;
+  max-height: 88dvh;
+  object-fit: contain;
+  display: block;
+  border-radius: 2px;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.5);
+  cursor: zoom-out;
+  animation: lb-zoom 0.3s cubic-bezier(.22,.61,.36,1);
 }
+@keyframes lb-zoom {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.gm-close, .gm-nav {
+  position: absolute;
+  background: rgba(251, 245, 236, 0.12);
+  border: 1px solid rgba(251, 245, 236, 0.25);
+  color: var(--c-ivory);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.gm-close:hover, .gm-nav:hover { background: rgba(251, 245, 236, 0.22); transform: scale(1.06); }
+.gm-close { top: calc(12px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); font-size: 22px; }
+.gm-nav   { top: 50%; transform: translateY(-50%); }
+.gm-prev  { left: calc(12px + env(safe-area-inset-left)); }
+.gm-next  { right: calc(12px + env(safe-area-inset-right)); }
+.gm-nav:hover { transform: translateY(-50%) scale(1.06); }
 
-.g-floater { position: absolute; pointer-events: none; z-index: 3; }
-.g-floater.f1 { top: -20px; left: -30px; transform: rotate(-15deg); }
-.g-floater.f2 { top: 42%; right: -40px; transform: rotate(25deg); }
-.g-floater.f3 { bottom: -20px; left: 40%; transform: rotate(10deg); }
+@media (max-width: 520px) {
+  .gm-nav { width: 38px; height: 38px; font-size: 24px; }
+  .gm-close { width: 38px; height: 38px; font-size: 20px; }
+}
 
 /* =========================================================
    Section 6 — Video

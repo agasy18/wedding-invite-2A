@@ -335,32 +335,75 @@ export const VenuesSection = () => (
 // --- Section 5: Gallery -----------------------------------------------------
 
 export const GallerySection = () => {
-  const pics = [
-    { label: 'COUPLE · 01', tone: 'linear-gradient(135deg, #F4B9C5, #F6D77A)' },
-    { label: 'COUPLE · 02', tone: 'linear-gradient(135deg, #B8C4E8, #F4B9C5)' },
-    { label: 'COUPLE · 03', tone: 'linear-gradient(135deg, #F09876, #F6D77A)' },
-    { label: 'COUPLE · 04', tone: 'linear-gradient(135deg, #A8B88C, #B8C4E8)' },
-    { label: 'COUPLE · 05', tone: 'linear-gradient(135deg, #F6D77A, #F09876)' },
-    { label: 'COUPLE · 06', tone: 'linear-gradient(135deg, #B8C4E8, #A8B88C)' },
+  // Ring now opens the mosaic as the full-width anchor (emotional hook:
+  // "what's this?"). Embrace moves to the tall-pair finale, landing with a
+  // portrait reveal of the couple. Grid math is preserved since both are
+  // 3:4 portraits — only the file numbers rotate.
+  const photos = [
+    { n: '08', span: 'span-hero' },   // ring — full-width anchor/opener
+    { n: '02', span: 'span-tall' },   // cinematic portrait
+    { n: '03', span: 'span-tall' },   // smile (paired with 02)
+    { n: '04', span: 'span-1' },      // Prague (square tile)
+    { n: '05', span: 'span-wide' },   // lake — landscape banner
+    { n: '06', span: 'span-1' },      // dinner (paired with 04)
+    { n: '07', span: 'span-tall' },   // champagne
+    { n: '01', span: 'span-tall' },   // embrace (paired with 07) — finale
   ];
+  const base = import.meta.env.BASE_URL;
+
+  const [preview, setPreview] = useState(null); // index of photo shown in lightbox
+
+  useEffect(() => {
+    if (preview == null) return;
+    const onKey = (e) => { if (e.key === 'Escape') setPreview(null); };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [preview]);
+
+  const go = (delta) => {
+    setPreview((i) => {
+      if (i == null) return i;
+      return (i + delta + photos.length) % photos.length;
+    });
+  };
+
   return (
     <section className="section gallery" data-screen-label="05 Gallery">
       <Reveal><div className="section-kicker"><ArmDivider width={80} /></div></Reveal>
       <Reveal delay={100}><h2 className="section-title">Մեր պահերը</h2></Reveal>
 
-      <div className="gallery-grid">
-        {pics.map((p, i) => (
-          <Reveal key={i} delay={180 + i * 80} className={`g-item g-${i}`} as="figure">
-            <div className="g-placeholder" style={{ background: p.tone }}>
-              <div className="g-stripes" aria-hidden />
-              <div className="g-label">{p.label}</div>
-            </div>
+      <div className="gallery-mosaic">
+        {photos.map((p, i) => (
+          <Reveal key={p.n} delay={100 + (i % 4) * 60} className={`gm-item ${p.span}`} as="button">
+            <img
+              className="gm-img"
+              src={`${base}gallery/${p.n}.jpg`}
+              alt=""
+              loading={i < 4 ? 'eager' : 'lazy'}
+              decoding="async"
+              onClick={() => setPreview(i)}
+            />
           </Reveal>
         ))}
-        <div className="g-floater f1" aria-hidden><Daisy size={60} /></div>
-        <div className="g-floater f2" aria-hidden><Rose size={80} color="var(--c-butter)" /></div>
-        <div className="g-floater f3" aria-hidden><Cosmos size={56} color="var(--c-peri)" /></div>
       </div>
+
+      {preview != null && (
+        <div className="gm-lightbox" role="dialog" aria-modal="true" onClick={() => setPreview(null)}>
+          <button className="gm-close" aria-label="Փակել" onClick={(e) => { e.stopPropagation(); setPreview(null); }}>×</button>
+          <button className="gm-nav gm-prev" aria-label="Նախորդը" onClick={(e) => { e.stopPropagation(); go(-1); }}>‹</button>
+          <img
+            className="gm-lightbox-img"
+            src={`${base}gallery/${photos[preview].n}.jpg`}
+            alt=""
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button className="gm-nav gm-next" aria-label="Հաջորդը" onClick={(e) => { e.stopPropagation(); go(1); }}>›</button>
+        </div>
+      )}
     </section>
   );
 };
