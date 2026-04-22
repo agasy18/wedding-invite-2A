@@ -83,7 +83,7 @@ export const HeroSection = ({ guestName }) => {
           <Reveal delay={700}>
             <h1 className="hero-names">
               <span className="n-first">Աղասի</span>
-              <span className="n-amp">&amp;</span>
+              <span className="n-amp">և</span>
               <span className="n-second">Աննա</span>
             </h1>
           </Reveal>
@@ -522,7 +522,7 @@ export const RsvpSection = ({ guestName, defaultGuests = 1 }) => {
             </div>
             <h3>Շնորհակալություն 🤍</h3>
             <p>{your} պատասխանը ստացված է։<br/>Ուրախ ենք, որ {youBe} մեզ հետ՝ <em>{guests}</em> հոգով։</p>
-            <p className="rsvp-sign">— Աղասի & Աննա</p>
+            <p className="rsvp-sign">— Աղասի և Աննա</p>
           </div>
         )}
 
@@ -530,7 +530,7 @@ export const RsvpSection = ({ guestName, defaultGuests = 1 }) => {
           <div className="rsvp-sent">
             <h3>Շնորհակալություն 🤍</h3>
             <p>Շնորհակալություն տեղեկացնելու համար։<br/>Մտովի մեզ հետ կլինեք։</p>
-            <p className="rsvp-sign">— Աղասի & Աննա</p>
+            <p className="rsvp-sign">— Աղասի և Աննա</p>
           </div>
         )}
       </div>
@@ -539,7 +539,7 @@ export const RsvpSection = ({ guestName, defaultGuests = 1 }) => {
 
       <footer className="rsvp-footer">
         <ArmDivider width={160} />
-        <div className="footer-names">Աղասի &amp; Աննա</div>
+        <div className="footer-names">Աղասի և Աննա</div>
         <div className="footer-date">06 · 09 · 2026</div>
       </footer>
     </section>

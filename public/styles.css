@@ -202,12 +202,13 @@ body::before {
 }
 
 .hero-names .n-amp {
-  font-family: var(--f-display);
-  font-style: italic;
-  font-size: 0.55em;
+  font-family: var(--f-arm-disp);
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.5em;
   color: var(--c-gold);
   line-height: 1;
-  margin: -8px 0;
+  margin: -4px 0;
 }
 
 .hero-names .n-first,

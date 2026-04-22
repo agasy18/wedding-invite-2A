@@ -109,7 +109,7 @@ const App = () => {
     const url = fullUrl(entry.name, entry.guests);
     const text = `Սիրելի ${entry.name}, սիրով հրավիրում ենք Ձեզ մեր հարսանյաց արարողությանը: ${url}`;
     if (navigator.share) {
-      navigator.share({ title: 'Աղասի & Աննա', text, url }).catch(() => {});
+      navigator.share({ title: 'Աղասի և Աննա', text, url }).catch(() => {});
     } else {
       copy(text, false);
     }
@@ -123,7 +123,7 @@ const App = () => {
       <FloralDefs />
 
       <header className="builder-header">
-        <div className="builder-eyebrow">Աղասի &amp; Աննա · 06.09.2026</div>
+        <div className="builder-eyebrow">Աղասի և Աննա · 06.09.2026</div>
         <h1 className="builder-title">Հրավիրատոմսերի գեներատոր</h1>
         <div className="builder-divider"><ArmDivider width={140} /></div>
         <p className="builder-sub">Generate a personal link for each guest</p>
