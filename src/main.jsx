@@ -79,7 +79,7 @@ const App = () => {
     };
     const onScroll = () => stop();
 
-    idleTimer = setTimeout(start, 5000);
+    idleTimer = setTimeout(start, 3000);
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('wheel', onScroll, { passive: true });
     window.addEventListener('touchmove', onScroll, { passive: true });
