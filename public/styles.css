@@ -930,13 +930,9 @@ body::before {
 .vp-video::-webkit-media-controls { display: none !important; }
 
 .vp-poster-dim {
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse at center, rgba(107,31,42,0.25) 0%, rgba(58,43,46,0.5) 100%);
-  pointer-events: none;
-  transition: opacity 0.4s ease;
+  /* Kept for the DOM node but now a no-op — poster shows at full brightness. */
+  display: none;
 }
-.vp.vp-started .vp-poster-dim { opacity: 0; }
 
 .vp-play {
   position: absolute;
