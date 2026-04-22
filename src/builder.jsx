@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 
 import { FloralDefs, Rose, Cosmos, ArmDivider } from './florals.jsx';
 import {
-  encodeName, isDictionaryHit, countNameTokens, buildPersonalUrl, ALL_NAMES,
+  encodeName, isDictionaryHit, countNameTokens, buildPersonalUrl,
 } from './nameCodec.js';
 
 const STORAGE_KEY = 'aa_guests_v2';
@@ -141,12 +141,8 @@ const App = () => {
             onChange={e => onNameChange(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') add(); }}
             placeholder="Արմեն Հակոբյան"
-            list="arm-names"
             autoFocus
           />
-          <datalist id="arm-names">
-            {ALL_NAMES.map(n => <option key={n} value={n} />)}
-          </datalist>
 
           {trimmedName && (
             <div className={`codec-hint ${hit ? 'hit' : 'fallback'}`}>
