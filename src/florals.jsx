@@ -1,7 +1,7 @@
-// Hand-drawn-feel floral SVG components. All flat, pastel, loose.
+// Hand-drawn-feel floral SVG components. Flat, pastel, loose.
 // Colors read from CSS variables so they respect palette tweaks.
 
-const FloralDefs = () => (
+export const FloralDefs = () => (
   <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden>
     <defs>
       <filter id="softshadow" x="-20%" y="-20%" width="140%" height="140%">
@@ -15,7 +15,7 @@ const FloralDefs = () => (
 );
 
 // Single 5-petal daisy
-const Daisy = ({ size = 40, petal = 'var(--c-ivory)', center = 'var(--c-butter)', style, className }) => (
+export const Daisy = ({ size = 40, petal = 'var(--c-ivory)', center = 'var(--c-butter)', style, className }) => (
   <svg viewBox="-50 -50 100 100" width={size} height={size} style={style} className={className}>
     {Array.from({ length: 10 }).map((_, i) => {
       const a = (i * 360) / 10;
@@ -41,7 +41,7 @@ const Daisy = ({ size = 40, petal = 'var(--c-ivory)', center = 'var(--c-butter)'
 );
 
 // Full rose (concentric spiraled petals)
-const Rose = ({ size = 60, color = 'var(--c-blush)', leaf = 'var(--c-sage)', style, className }) => (
+export const Rose = ({ size = 60, color = 'var(--c-blush)', leaf = 'var(--c-sage)', style, className }) => (
   <svg viewBox="-50 -50 100 100" width={size} height={size} style={style} className={className}>
     {/* leaves */}
     <path d="M -30 15 Q -45 5 -40 -15 Q -25 -5 -28 12 Z" fill={leaf} opacity="0.9" />
@@ -63,7 +63,7 @@ const Rose = ({ size = 60, color = 'var(--c-blush)', leaf = 'var(--c-sage)', sty
 );
 
 // Small cosmos / wildflower
-const Cosmos = ({ size = 38, color = 'var(--c-coral)', center = 'var(--c-butter)', style, className }) => (
+export const Cosmos = ({ size = 38, color = 'var(--c-coral)', center = 'var(--c-butter)', style, className }) => (
   <svg viewBox="-50 -50 100 100" width={size} height={size} style={style} className={className}>
     {Array.from({ length: 8 }).map((_, i) => {
       const a = (i * 360) / 8;
@@ -83,7 +83,7 @@ const Cosmos = ({ size = 38, color = 'var(--c-coral)', center = 'var(--c-butter)
 );
 
 // Tiny cluster of forget-me-nots
-const Cluster = ({ size = 44, color = 'var(--c-peri)', style, className }) => (
+export const Cluster = ({ size = 44, color = 'var(--c-peri)', style, className }) => (
   <svg viewBox="-50 -50 100 100" width={size} height={size} style={style} className={className}>
     {[[-15, -10], [12, -15], [0, 8], [-18, 15], [18, 12], [-5, -22]].map(([cx, cy], i) => (
       <g key={i} transform={`translate(${cx} ${cy})`}>
@@ -97,7 +97,7 @@ const Cluster = ({ size = 44, color = 'var(--c-peri)', style, className }) => (
 );
 
 // Leafy stem
-const Stem = ({ width = 120, height = 200, color = 'var(--c-sage)', style, className, flip }) => (
+export const Stem = ({ width = 120, height = 200, color = 'var(--c-sage)', style, className, flip }) => (
   <svg viewBox="0 0 120 200" width={width} height={height} style={style} className={className}
     preserveAspectRatio="none">
     <g transform={flip ? 'scale(-1,1) translate(-120,0)' : ''}>
@@ -111,7 +111,7 @@ const Stem = ({ width = 120, height = 200, color = 'var(--c-sage)', style, class
 );
 
 // Single petal (for confetti)
-const Petal = ({ size = 20, color = 'var(--c-blush)', style }) => (
+export const Petal = ({ size = 20, color = 'var(--c-blush)', style }) => (
   <svg viewBox="-20 -20 40 40" width={size} height={size} style={style}>
     <path d="M 0 -18 Q 14 -6 10 10 Q 0 18 -10 10 Q -14 -6 0 -18 Z"
       fill={color} stroke="rgba(90,30,40,0.12)" strokeWidth="0.6" />
@@ -119,7 +119,7 @@ const Petal = ({ size = 20, color = 'var(--c-blush)', style }) => (
 );
 
 // Armenian ornamental divider — a khachkar-inspired horizontal line
-const ArmDivider = ({ width = 200, color = 'var(--c-gold)' }) => (
+export const ArmDivider = ({ width = 200, color = 'var(--c-gold)' }) => (
   <svg viewBox="0 0 200 24" width={width} height={24} style={{ display: 'block' }}>
     <g stroke={color} strokeWidth="1" fill="none">
       <line x1="0" y1="12" x2="72" y2="12" />
@@ -137,8 +137,7 @@ const ArmDivider = ({ width = 200, color = 'var(--c-gold)' }) => (
 );
 
 // Wreath — arranged flowers in an arc/circle. Used around hero.
-const Wreath = ({ width = 700, height = 700, density = 1 }) => {
-  // Positions spread around a ring — mix rose / daisy / cosmos / cluster
+export const Wreath = ({ width = 700, height = 700, density = 1 }) => {
   const items = [
     { x: 50, y: 18, r: -15, c: Rose, s: 110, p: { color: 'var(--c-blush)' } },
     { x: 82, y: 28, r: 20, c: Cosmos, s: 70, p: { color: 'var(--c-coral)' } },
@@ -172,5 +171,3 @@ const Wreath = ({ width = 700, height = 700, density = 1 }) => {
     </div>
   );
 };
-
-Object.assign(window, { FloralDefs, Daisy, Rose, Cosmos, Cluster, Stem, Petal, ArmDivider, Wreath });

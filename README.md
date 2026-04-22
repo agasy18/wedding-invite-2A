@@ -1,35 +1,43 @@
 # Wedding Invite — Աղասի & Աննա
 
-Static, personalized wedding invitation site. All HTML + React-via-CDN + Babel-in-browser — no build step, hosts anywhere that serves static files.
+Single-page Armenian wedding invitation built with Vite + React. Includes a companion guest-link builder. Hosted on GitHub Pages.
 
 ## Files
 
 ```
-index.html          # main invite page (hero, countdown, schedule, venues, gallery, video, RSVP)
-builder.html        # guest-link generator (internal tool, saves to localStorage)
-sections.jsx        # the 7 section React components + confetti/reveal helpers
-florals.jsx         # hand-drawn-feel floral SVG components + wreath + divider
-styles.css          # palette + all section styles
-favicon.svg         # site icon
-.github/workflows/deploy.yml   # GitHub Pages deploy (no build — publishes the repo root)
+index.html            # invite page shell
+builder.html          # guest-link generator shell
+src/
+  main.jsx            # invite entry
+  builder.jsx         # builder entry
+  sections.jsx        # the 7 section components + helpers
+  florals.jsx         # hand-drawn-feel floral SVG components
+  nameCodec.js        # short-URL dictionary + base64url fallback
+  builder.css         # builder-only styles
+public/
+  styles.css          # all shared palette + layout styles
+  favicon.svg
+vite.config.js
+package.json
+.github/workflows/deploy.yml
 ```
 
 ## Run locally
 
-Any static file server works. Easiest:
-
 ```bash
-# Python 3
-python3 -m http.server 8080
-
-# Or Node (if you have it)
-npx serve .
+npm install
+npm run dev
 ```
 
-Then open:
+Vite prints a URL (usually `http://localhost:5173/`). The invite is `/`, the builder is `/builder.html`.
 
-- <http://localhost:8080/> — the invite
-- <http://localhost:8080/builder.html> — the generator
+## Build
+
+```bash
+npm run build
+```
+
+Produces `dist/` ready to publish as static files.
 
 ## Personalized URLs
 
@@ -37,33 +45,31 @@ The invite reads one URL param:
 
 | param | meaning | example |
 |---|---|---|
-| `name` | guest name (URL-encoded) | `?name=%D4%B1%D6%80%D5%A1%D5%B4` |
+| `n` | encoded guest name (short dict ID or `b.<base64url>`) | `?n=m71` or `?n=b.1LPVodWe1YjVuA` |
+| `name` | legacy raw guest name (still supported) | `?name=Աղասի` |
 
-Open `builder.html` to generate these interactively. The builder also keeps a saved-guests list in the browser's localStorage (per device).
+Open `/builder.html` to generate URLs interactively. Common Armenian names are mapped to short IDs (`Աղասի` → `m71`, `Աննա` → `f88`, etc.). Non-dictionary names fall back to base64url-encoded UTF-8 — slightly longer but works for any name. To shorten more names, add them to `src/nameCodec.js`.
 
 ## Customize
 
-- **Wedding date & names**: search `sections.jsx` and `index.html`. The date appears in the hero, countdown target (`new Date('2026-09-06T16:00:00+04:00')`), schedule, and footer.
-- **Venue info**: `sections.jsx` → `ScheduleSection` and `VenuesSection` arrays.
-- **YouTube video**: `sections.jsx` → `VideoSection`. Currently a click-to-reveal placeholder; swap the placeholder `<div>` for a real `<iframe>` if you want the embed.
-- **RSVP submission**: `sections.jsx` → `RsvpSection`. Currently shows a confirmation UI with localStorage. To send to a Google Form, replace the `confirm()` handler with a `fetch()` to the form's `formResponse` endpoint, or swap the card for a pre-filled Google Form link.
+- **Couple names + date**: `src/sections.jsx` (`HeroSection`, `CountdownSection`, `RsvpSection`)
+- **Venues**: `src/sections.jsx` → `ScheduleSection` and `VenuesSection` arrays
+- **Countdown target**: `src/sections.jsx` → `CountdownSection` (`new Date('2026-09-06T16:00:00+04:00')`)
+- **Palette + typography**: `public/styles.css` (CSS variables at the top)
+- **Page titles/favicon**: `index.html`, `builder.html`
+- **YouTube video**: `src/sections.jsx` → `VideoSection` is a click-to-reveal placeholder; swap the placeholder `<div>` for a real `<iframe>` to embed.
 
 ## Deploy to GitHub Pages
 
 1. Push this repo to GitHub.
 2. Settings → Pages → Source: **GitHub Actions**.
-3. Workflow at `.github/workflows/deploy.yml` publishes the repo root on every push to `main`.
+3. `.github/workflows/deploy.yml` runs `npm ci && npm run build` and publishes `dist/` on every push to `main`.
 4. Visit `https://<user>.github.io/<repo>/`.
+
+### Project-page URL (with `/<repo>/` prefix)
+
+If your Pages URL is `https://<user>.github.io/wedding-invite-2A/`, assets will 404 because they resolve from `/`. Fix by setting `base: '/wedding-invite-2A/'` in `vite.config.js`.
 
 ### Custom domain
 
-Add a `CNAME` file at the repo root containing your domain, and set the DNS record per [GitHub's docs](https://docs.github.com/pages/configuring-a-custom-domain-for-your-github-pages-site).
-
-## Performance note
-
-This uses in-browser Babel to transform JSX at load time (`@babel/standalone`, ~1MB). That's fine for a wedding invite, but if you want to squeeze it:
-
-1. Precompile `sections.jsx` and `florals.jsx` to `.js` with `npx babel --presets @babel/preset-react …`, and remove the `@babel/standalone` script tag.
-2. Or switch to Vite + React for proper bundling.
-
-Neither is necessary — as-is, the site works and looks right.
+Add `public/CNAME` containing your domain, keep `base: '/'`, and set DNS per [GitHub's docs](https://docs.github.com/pages/configuring-a-custom-domain-for-your-github-pages-site).

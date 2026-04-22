@@ -1,7 +1,9 @@
 // Seven sections of the Aghasi & Anna invitation.
-// Uses globals from florals.jsx.
 
-const { useState, useEffect, useRef, useMemo } = React;
+import { useState, useEffect, useRef, useMemo } from 'react';
+import {
+  Rose, Daisy, Cosmos, Cluster, Petal, ArmDivider, Wreath,
+} from './florals.jsx';
 
 // --- Helpers ----------------------------------------------------------------
 
@@ -20,7 +22,7 @@ const useInView = (threshold = 0.2) => {
   return [ref, inView];
 };
 
-const Reveal = ({ children, delay = 0, as: Tag = 'div', style, className }) => {
+export const Reveal = ({ children, delay = 0, as: Tag = 'div', style, className }) => {
   const [ref, inView] = useInView(0.15);
   return (
     <Tag ref={ref} className={className}
@@ -37,7 +39,7 @@ const Reveal = ({ children, delay = 0, as: Tag = 'div', style, className }) => {
 
 // --- Section 1: Hero --------------------------------------------------------
 
-const HeroSection = ({ guestName }) => {
+export const HeroSection = ({ guestName }) => {
   return (
     <section className="section hero" data-screen-label="01 Invitation">
       {/* drifting petals behind wreath */}
@@ -107,7 +109,7 @@ const HeroSection = ({ guestName }) => {
 
 // --- Section 2: Countdown ---------------------------------------------------
 
-const CountdownSection = () => {
+export const CountdownSection = () => {
   const target = useMemo(() => new Date('2026-09-06T16:00:00+04:00').getTime(), []);
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
@@ -197,7 +199,7 @@ const TickDigit = ({ digit }) => {
 
 // --- Section 3: Schedule ----------------------------------------------------
 
-const ScheduleSection = () => {
+export const ScheduleSection = () => {
   const items = [
     {
       time: '16:00',
@@ -277,7 +279,7 @@ const VenueCard = ({ label, name, address, mapUrl, accent, flowerTop, flowerBot,
   </Reveal>
 );
 
-const VenuesSection = () => (
+export const VenuesSection = () => (
   <section className="section venues" data-screen-label="04 Venues">
     <Reveal><div className="section-kicker"><ArmDivider width={80} /></div></Reveal>
     <Reveal delay={100}><h2 className="section-title">Վայրեր</h2></Reveal>
@@ -287,7 +289,7 @@ const VenuesSection = () => (
         label="ՊՍԱԿԱԴՐՈՒԹՅՈՒՆ"
         name="Հովհաննավանք"
         address="Օհանավան, Արագածոտնի մարզ"
-        mapUrl="https://maps.google.com/?q=Hovhannavank"
+        mapUrl="https://maps.app.goo.gl/oXYfuaTVpYhbXRYE8"
         accent="linear-gradient(135deg, #FDF3E7 0%, #F9E4D4 100%)"
         flowerTop={<Rose size={80} color="var(--c-blush)" />}
         flowerBot={<Daisy size={44} />}
@@ -297,7 +299,7 @@ const VenuesSection = () => (
         label="ՀԱՆԴԻՍՈՒԹՅՈՒՆ"
         name="Ոսկեվազի Գինու Գործարան"
         address="Ոսկեվազ, Արագածոտնի մարզ"
-        mapUrl="https://maps.google.com/?q=Voskevaz+Winery"
+        mapUrl="https://maps.app.goo.gl/UnzKpZSZVogbC2kv9"
         accent="linear-gradient(135deg, #F3E8F0 0%, #E8DEEA 100%)"
         flowerTop={<Cosmos size={70} color="var(--c-coral)" />}
         flowerBot={<Cluster size={50} color="var(--c-peri)" />}
@@ -309,7 +311,7 @@ const VenuesSection = () => (
 
 // --- Section 5: Gallery -----------------------------------------------------
 
-const GallerySection = () => {
+export const GallerySection = () => {
   const pics = [
     { label: 'COUPLE · 01', tone: 'linear-gradient(135deg, #F4B9C5, #F6D77A)' },
     { label: 'COUPLE · 02', tone: 'linear-gradient(135deg, #B8C4E8, #F4B9C5)' },
@@ -342,7 +344,7 @@ const GallerySection = () => {
 
 // --- Section 6: Video -------------------------------------------------------
 
-const VideoSection = () => {
+export const VideoSection = () => {
   const [playing, setPlaying] = useState(false);
   return (
     <section className="section video" data-screen-label="06 Video">
@@ -372,8 +374,8 @@ const VideoSection = () => {
 
 // --- Section 7: RSVP --------------------------------------------------------
 
-const RsvpSection = ({ guestName }) => {
-  const [state, setState] = useState('idle'); // idle | form | sent
+export const RsvpSection = ({ guestName }) => {
+  const [state, setState] = useState('idle'); // idle | form | sent | decline
   const [guests, setGuests] = useState(1);
   const [burst, setBurst] = useState(false);
 
@@ -477,8 +479,8 @@ const Confetti = () => {
           left: `${p.left}%`,
           animationDelay: `${p.delay}s`,
           animationDuration: `${p.dur}s`,
-          ['--drift']: `${p.drift}px`,
-          ['--rot']: `${p.rot}deg`,
+          '--drift': `${p.drift}px`,
+          '--rot': `${p.rot}deg`,
         }}>
           {p.kind === 0 && <Petal size={p.size} color={p.color} />}
           {p.kind === 1 && <Daisy size={p.size} petal={p.color} />}
@@ -488,8 +490,3 @@ const Confetti = () => {
     </div>
   );
 };
-
-Object.assign(window, {
-  HeroSection, CountdownSection, ScheduleSection, VenuesSection,
-  GallerySection, VideoSection, RsvpSection, Reveal,
-});
