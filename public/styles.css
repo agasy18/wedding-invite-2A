@@ -900,23 +900,141 @@ body::before {
 
 .video-frame {
   position: relative;
-  /* Width tied to height so the 9:16 frame fills as much of the slide as
-     possible without overflowing. `52dvh` at 9:16 gives height ≈ 92dvh. */
-  width: min(520px, 95vw, 52dvh);
+  /* Width tied to height so the 9:16 frame fits the slide's available space.
+     46dvh gives frame-height ≈ 82dvh — leaves room for the caption below. */
+  width: min(440px, 90vw, 46dvh);
   aspect-ratio: 9/16;
   margin-top: 0;
 }
 
-.video-player {
+/* ------- Custom video player chrome ------- */
+.vp {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 20px 60px rgba(107,31,42,0.2);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.vp-video {
   width: 100%;
   height: 100%;
   display: block;
-  border-radius: 3px;
-  box-shadow: 0 20px 60px rgba(107,31,42,0.15);
-  background: #000;
   object-fit: cover;
+  background: #000;
+}
+.vp-video::-webkit-media-controls { display: none !important; }
+
+.vp-poster-dim {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at center, rgba(107,31,42,0.25) 0%, rgba(58,43,46,0.5) 100%);
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.vp.vp-started .vp-poster-dim { opacity: 0; }
+
+.vp-play {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.4s ease;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4));
+  z-index: 3;
+}
+.vp-play:hover { transform: translate(-50%, -50%) scale(1.08); }
+.vp-play:focus-visible { outline: 2px solid var(--c-gold); outline-offset: 4px; border-radius: 50%; }
+
+.vp.vp-started.vp-playing.vp-chrome-hidden .vp-play {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.vp-chrome {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 100%);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 2;
+}
+.vp.vp-started .vp-chrome { opacity: 1; transform: translateY(0); }
+.vp.vp-started.vp-playing.vp-chrome-hidden .vp-chrome {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+}
+
+.vp-btn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.vp-btn:hover { background: rgba(251,245,236,0.15); }
+.vp-btn:focus-visible { outline: 2px solid var(--c-gold); outline-offset: 2px; }
+
+.vp-progress-wrap {
+  flex: 1;
+  height: 24px;
+  display: flex;
+  align-items: center;
   position: relative;
-  z-index: 1;
+  cursor: pointer;
+}
+.vp-progress-track {
+  position: absolute; left: 0; right: 0;
+  height: 2px;
+  background: rgba(251,245,236,0.25);
+  border-radius: 1px;
+}
+.vp-progress-fill {
+  position: absolute; left: 0;
+  height: 2px;
+  background: var(--c-gold);
+  border-radius: 1px;
+  transition: width 0.1s linear;
+}
+.vp-progress-thumb {
+  position: absolute;
+  top: 50%;
+  width: 10px; height: 10px;
+  margin-left: -5px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  box-shadow: 0 0 0 2px rgba(251,245,236,0.9);
+}
+.vp-progress-wrap:hover .vp-progress-thumb {
+  width: 14px; height: 14px; margin-left: -7px; margin-top: -7px;
+}
+
+.vp-time {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--c-ivory);
+  opacity: 0.85;
+  white-space: nowrap;
+  min-width: 72px;
+  text-align: right;
 }
 
 .video-caption {

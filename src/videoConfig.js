@@ -10,3 +10,5 @@ export const VIDEO_SOURCES = [
   { src: import.meta.env.BASE_URL + 'video/invite.hevc.mp4', type: 'video/mp4; codecs="hvc1"' },
   { src: import.meta.env.BASE_URL + 'video/invite.h264.mp4', type: 'video/mp4; codecs="avc1.640028"' },
 ];
+
+export const VIDEO_POSTER = import.meta.env.BASE_URL + 'video/invite.poster.jpg';

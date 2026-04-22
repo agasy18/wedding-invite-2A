@@ -6,7 +6,7 @@ import {
 } from './florals.jsx';
 import { pronoun } from './nameCodec.js';
 import { submitRsvp } from './rsvpForm.js';
-import { VIDEO_SOURCES } from './videoConfig.js';
+import { VideoPlayer } from './VideoPlayer.jsx';
 
 // --- Helpers ----------------------------------------------------------------
 
@@ -374,17 +374,7 @@ export const VideoSection = ({ guestName }) => {
       <Reveal className="video-frame" as="div">
         <div className="video-flower tl" aria-hidden><Rose size={90} color="var(--c-blush)" /></div>
         <div className="video-flower br" aria-hidden><Cosmos size={70} color="var(--c-coral)" /></div>
-        <video
-          className="video-player"
-          controls
-          playsInline
-          preload="metadata"
-        >
-          {VIDEO_SOURCES.map(s => (
-            <source key={s.src} src={s.src} type={s.type} />
-          ))}
-          Your browser does not support this video.
-        </video>
+        <VideoPlayer />
       </Reveal>
 
       <Reveal delay={220}>
