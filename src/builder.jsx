@@ -5,6 +5,7 @@ import { FloralDefs, Rose, Cosmos, ArmDivider } from './florals.jsx';
 import {
   encodeName, isDictionaryHit, countNameTokens, buildPersonalUrl,
 } from './nameCodec.js';
+import { checkPassphrase, isUnlocked, markUnlocked } from './builderAuth.js';
 
 const STORAGE_KEY = 'aa_guests_v2';
 const LEGACY_STORAGE_KEY = 'aa_guests_v1';
@@ -230,4 +231,74 @@ const App = () => {
   );
 };
 
-createRoot(document.getElementById('root')).render(<App />);
+// --- Lock screen -----------------------------------------------------------
+
+const LockScreen = ({ onUnlock }) => {
+  const [value, setValue] = useState('');
+  const [error, setError] = useState(false);
+  const [checking, setChecking] = useState(false);
+
+  const submit = async (e) => {
+    e?.preventDefault();
+    if (!value || checking) return;
+    setChecking(true);
+    const ok = await checkPassphrase(value);
+    if (ok) {
+      await markUnlocked(value);
+      setChecking(false);
+      onUnlock();
+    } else {
+      setChecking(false);
+      setError(true);
+      setValue('');
+    }
+  };
+
+  return (
+    <div className="builder-wrap">
+      <FloralDefs />
+      <header className="builder-header">
+        <div className="builder-eyebrow">Աղասի և Աննա · 06.09.2026</div>
+        <h1 className="builder-title">Մուտք</h1>
+        <div className="builder-divider"><ArmDivider width={140} /></div>
+        <p className="builder-sub">Enter passphrase to continue</p>
+      </header>
+
+      <div className="builder-card">
+        <div className="builder-flower bf-tl"><Rose size={100} color="var(--c-blush)" /></div>
+        <div className="builder-flower bf-br"><Cosmos size={80} color="var(--c-coral)" /></div>
+        <form className="builder-form" onSubmit={submit}>
+          <label className="field-label">Գաղտնաբառ · Passphrase</label>
+          <input
+            className="name-input"
+            type="password"
+            value={value}
+            onChange={e => { setValue(e.target.value); setError(false); }}
+            autoFocus
+            autoComplete="current-password"
+            spellCheck={false}
+          />
+          {error && (
+            <div className="codec-hint fallback" style={{ marginTop: 10 }}>
+              ✗ Սխալ գաղտնաբառ
+            </div>
+          )}
+          <div className="actions">
+            <button className="btn-share" type="submit" disabled={!value || checking}
+              style={{ opacity: value && !checking ? 1 : 0.5, cursor: value && !checking ? 'pointer' : 'not-allowed' }}>
+              {checking ? 'Ստուգում…' : 'Մուտք'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const Root = () => {
+  const [unlocked, setUnlocked] = useState(isUnlocked);
+  if (!unlocked) return <LockScreen onUnlock={() => setUnlocked(true)} />;
+  return <App />;
+};
+
+createRoot(document.getElementById('root')).render(<Root />);
