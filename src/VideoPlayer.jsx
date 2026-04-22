@@ -25,28 +25,56 @@ export const VideoPlayer = () => {
   const [duration, setDuration] = useState(0);
   const [chromeVisible, setChromeVisible] = useState(true);
 
-  // Auto-pause when the video slide scrolls out of view; auto-resume when it
-  // comes back — but only if the user had it playing before (never start
-  // uninvited).
+  // Tracks whether the user has ever tapped play themselves. Until then we
+  // treat the video as "teaser mode": muted autoplay on scroll-in, pause
+  // after ~1s so they have to tap to hear it.
+  const userStartedRef = useRef(false);
+  const teaserTimerRef = useRef(null);
+
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
+
     const obs = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
-          if (wasPlayingRef.current) v.play().catch(() => {});
+          if (!userStartedRef.current) {
+            // Teaser: muted 1-second preview, then pause + force unmute
+            // prompt by resetting to muted=false-but-paused. User taps
+            // the central play button to start with sound.
+            v.muted = true;
+            setMuted(true);
+            v.currentTime = 0;
+            v.play().catch(() => {});
+            clearTimeout(teaserTimerRef.current);
+            teaserTimerRef.current = setTimeout(() => {
+              if (!userStartedRef.current) {
+                v.pause();
+                v.currentTime = 0;
+                v.muted = false;
+                setMuted(false);
+                // setStarted(false) so the big play button is visible again
+                setStarted(false);
+              }
+            }, 1000);
+          } else if (wasPlayingRef.current) {
+            v.play().catch(() => {});
+          }
         } else {
+          clearTimeout(teaserTimerRef.current);
           if (!v.paused) {
-            wasPlayingRef.current = true;
+            // Only remember "was playing" if the user had actually started.
+            // A teaser preview interrupted by scroll shouldn't auto-resume.
+            if (userStartedRef.current) wasPlayingRef.current = true;
             v.pause();
           } else {
             wasPlayingRef.current = false;
           }
         }
       });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.9 });
     obs.observe(v);
-    return () => obs.disconnect();
+    return () => { obs.disconnect(); clearTimeout(teaserTimerRef.current); };
   }, []);
 
   // Hide controls 2s after the user stops interacting *while playing*.
@@ -83,6 +111,15 @@ export const VideoPlayer = () => {
     const v = videoRef.current;
     if (!v) return;
     if (v.paused) {
+      // First user-initiated play: cancel any pending teaser pause, unmute,
+      // and mark the session as "user has taken over" so autoplay logic stops
+      // imposing the teaser behaviour.
+      clearTimeout(teaserTimerRef.current);
+      if (!userStartedRef.current) {
+        v.muted = false;
+        setMuted(false);
+        userStartedRef.current = true;
+      }
       v.play().catch(() => {});
       setStarted(true);
     } else {
