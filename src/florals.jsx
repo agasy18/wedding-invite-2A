@@ -118,6 +118,31 @@ export const Petal = ({ size = 20, color = 'var(--c-blush)', style }) => (
   </svg>
 );
 
+// Location pin shaped like a flower — a teardrop outline with a 5-petal
+// daisy as the inner glyph instead of the usual solid dot.
+export const FloralPin = ({ size = 18, color = 'var(--c-wine)', petal = 'var(--c-ivory)', center = 'var(--c-butter)', style, className }) => (
+  <svg viewBox="-12 -12 24 28" width={size} height={size * (28 / 24)} style={style} className={className} aria-hidden>
+    {/* teardrop body — classic map pin silhouette */}
+    <path
+      d="M 0 14 C -8 4 -10 -2 -10 -4 A 10 10 0 1 1 10 -4 C 10 -2 8 4 0 14 Z"
+      fill={color}
+      stroke={color}
+      strokeWidth="0.6"
+      strokeLinejoin="round"
+    />
+    {/* 5-petal flower where the dot usually goes */}
+    <g transform="translate(0 -4) scale(0.55)">
+      {[0, 72, 144, 216, 288].map((a, i) => (
+        <ellipse key={i} cx="0" cy="-5" rx="2.4" ry="4.2"
+          fill={petal}
+          stroke="rgba(90,30,40,0.2)" strokeWidth="0.4"
+          transform={`rotate(${a})`} />
+      ))}
+      <circle cx="0" cy="0" r="2" fill={center} />
+    </g>
+  </svg>
+);
+
 // Armenian ornamental divider — a khachkar-inspired horizontal line
 export const ArmDivider = ({ width = 200, color = 'var(--c-gold)' }) => (
   <svg viewBox="0 0 200 24" width={width} height={24} style={{ display: 'block' }}>

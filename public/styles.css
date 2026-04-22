@@ -623,6 +623,14 @@ body::before {
   transition: all 0.2s;
 }
 .story-cta:hover { color: var(--c-gold); transform: translateX(2px); }
+.story-cta-row {
+  margin-top: 12px;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.story-cta-row .story-cta { margin-top: 0; display: inline-flex; align-items: center; gap: 6px; }
+.story-cta-row .story-cta svg { flex-shrink: 0; }
 
 .agenda-card {
   position: relative;
@@ -799,6 +807,16 @@ body::before {
   transition: all 0.2s;
 }
 .venue-cta:hover { color: var(--c-gold); transform: translateX(2px); }
+.venue-cta-row {
+  position: relative;
+  margin-top: 20px;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.venue-cta-row .venue-cta { margin-top: 0; display: inline-flex; align-items: center; gap: 6px; }
+.venue-cta-row .venue-cta svg { flex-shrink: 0; }
 
 /* =========================================================
    Section 5 — Gallery

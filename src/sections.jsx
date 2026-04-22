@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import {
-  Rose, Daisy, Cosmos, Cluster, Petal, ArmDivider, Wreath,
+  Rose, Daisy, Cosmos, Cluster, Petal, ArmDivider, Wreath, FloralPin,
 } from './florals.jsx';
 import { pronoun } from './nameCodec.js';
 import { submitRsvp } from './rsvpForm.js';
@@ -102,7 +102,7 @@ export const HeroSection = ({ guestName }) => {
       </div>
 
       <div className="scroll-cue" aria-hidden>
-        <span>ոլորեք</span>
+        <span>թերթել</span>
         <div className="scroll-line" />
       </div>
     </section>
@@ -208,7 +208,10 @@ export const ScheduleSection = () => {
       title: 'Պսակադրություն',
       venue: 'Հովհաննավանք',
       addr: 'Օհանավան, Արագածոտնի մարզ',
-      mapUrl: 'https://maps.app.goo.gl/oXYfuaTVpYhbXRYE8',
+      mapLinks: [
+        { label: 'Google Maps', url: 'https://maps.app.goo.gl/oXYfuaTVpYhbXRYE8' },
+        { label: 'Yandex Maps', url: 'https://yandex.com/maps/-/CPC-ASzc' },
+      ],
       flower: <Rose size={72} color="var(--c-blush)" />,
     },
     {
@@ -216,7 +219,10 @@ export const ScheduleSection = () => {
       title: 'Հարսանյաց հանդիսություն',
       venue: 'Ոսկեվազի Գինու Գործարան',
       addr: 'Ոսկեվազ, Արագածոտնի մարզ',
-      mapUrl: 'https://maps.app.goo.gl/UnzKpZSZVogbC2kv9',
+      mapLinks: [
+        { label: 'Google Maps', url: 'https://maps.app.goo.gl/UnzKpZSZVogbC2kv9' },
+        { label: 'Yandex Maps', url: 'https://yandex.com/maps/-/CPC-E01X' },
+      ],
       flower: <Cosmos size={64} color="var(--c-coral)" />,
     },
   ];
@@ -238,10 +244,14 @@ export const ScheduleSection = () => {
               <div className="story-title-line">{it.title}</div>
               {it.venue && <div className="story-venue">{it.venue}</div>}
               {it.addr && <div className="story-addr">{it.addr}</div>}
-              {it.mapUrl && (
-                <a className="story-cta" href={it.mapUrl} target="_blank" rel="noopener">
-                  Տեսնել քարտեզի վրա →
-                </a>
+              {it.mapLinks && it.mapLinks.length > 0 && (
+                <div className="story-cta-row">
+                  {it.mapLinks.map(m => (
+                    <a key={m.url} className="story-cta" href={m.url} target="_blank" rel="noopener">
+                      <FloralPin size={14} /> {m.label}
+                    </a>
+                  ))}
+                </div>
               )}
             </div>
           </Reveal>
@@ -253,7 +263,7 @@ export const ScheduleSection = () => {
 
 // --- Section 4: Venues ------------------------------------------------------
 
-const VenueCard = ({ label, name, address, mapUrl, accent, flowerTop, flowerBot, delay }) => (
+const VenueCard = ({ label, name, address, mapLinks = [], accent, flowerTop, flowerBot, delay }) => (
   <Reveal delay={delay} className="venue-card" as="div">
     <div className="venue-flower top" aria-hidden>{flowerTop}</div>
     <div className="venue-flower bot" aria-hidden>{flowerBot}</div>
@@ -275,9 +285,13 @@ const VenueCard = ({ label, name, address, mapUrl, accent, flowerTop, flowerBot,
         <circle cx="150" cy="90" r="18" fill="none" stroke="var(--c-wine)" strokeWidth="1" opacity="0.4" />
       </svg>
     </div>
-    <a className="venue-cta" href={mapUrl} target="_blank" rel="noopener">
-      Տեսնել քարտեզի վրա →
-    </a>
+    <div className="venue-cta-row">
+      {mapLinks.map(m => (
+        <a key={m.url} className="venue-cta" href={m.url} target="_blank" rel="noopener">
+          <FloralPin size={15} /> {m.label}
+        </a>
+      ))}
+    </div>
   </Reveal>
 );
 
@@ -291,7 +305,10 @@ export const VenuesSection = () => (
         label="ՊՍԱԿԱԴՐՈՒԹՅՈՒՆ"
         name="Հովհաննավանք"
         address="Օհանավան, Արագածոտնի մարզ"
-        mapUrl="https://maps.app.goo.gl/oXYfuaTVpYhbXRYE8"
+        mapLinks={[
+          { label: 'Google Maps', url: 'https://maps.app.goo.gl/oXYfuaTVpYhbXRYE8' },
+          { label: 'Yandex Maps', url: 'https://yandex.com/maps/-/CPC-ASzc' },
+        ]}
         accent="linear-gradient(135deg, #FDF3E7 0%, #F9E4D4 100%)"
         flowerTop={<Rose size={80} color="var(--c-blush)" />}
         flowerBot={<Daisy size={44} />}
@@ -301,7 +318,10 @@ export const VenuesSection = () => (
         label="ՀԱՆԴԻՍՈՒԹՅՈՒՆ"
         name="Ոսկեվազի Գինու Գործարան"
         address="Ոսկեվազ, Արագածոտնի մարզ"
-        mapUrl="https://maps.app.goo.gl/UnzKpZSZVogbC2kv9"
+        mapLinks={[
+          { label: 'Google Maps', url: 'https://maps.app.goo.gl/UnzKpZSZVogbC2kv9' },
+          { label: 'Yandex Maps', url: 'https://yandex.com/maps/-/CPC-E01X' },
+        ]}
         accent="linear-gradient(135deg, #F3E8F0 0%, #E8DEEA 100%)"
         flowerTop={<Cosmos size={70} color="var(--c-coral)" />}
         flowerBot={<Cluster size={50} color="var(--c-peri)" />}
