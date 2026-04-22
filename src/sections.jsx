@@ -371,10 +371,7 @@ export const VideoSection = ({ guestName }) => {
   const you = pronoun(guestName, 'you');
   return (
     <section className="section video" data-screen-label="06 Video">
-      <Reveal><div className="section-kicker"><ArmDivider width={80} /></div></Reveal>
-      <Reveal delay={100}><h2 className="section-title">Հատուկ {you} համար</h2></Reveal>
-
-      <Reveal delay={220} className="video-frame" as="div">
+      <Reveal className="video-frame" as="div">
         <div className="video-flower tl" aria-hidden><Rose size={90} color="var(--c-blush)" /></div>
         <div className="video-flower br" aria-hidden><Cosmos size={70} color="var(--c-coral)" /></div>
         <div className={`video-placeholder ${playing ? 'playing' : ''}`}
@@ -390,6 +387,10 @@ export const VideoSection = ({ guestName }) => {
             </svg>
           </button>
         </div>
+      </Reveal>
+
+      <Reveal delay={220}>
+        <p className="video-caption">Հատուկ {you} համար</p>
       </Reveal>
     </section>
   );

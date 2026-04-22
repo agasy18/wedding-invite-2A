@@ -903,7 +903,18 @@ body::before {
      possible without overflowing. `52dvh` at 9:16 gives height ≈ 92dvh. */
   width: min(520px, 95vw, 52dvh);
   aspect-ratio: 9/16;
-  margin-top: 16px;
+  margin-top: 0;
+}
+
+.video-caption {
+  margin: 18px 0 0;
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-size: clamp(14px, 2vw, 17px);
+  color: var(--c-wine-2);
+  opacity: 0.8;
+  letter-spacing: 0.04em;
+  text-align: center;
 }
 
 .video-flower { position: absolute; z-index: 3; pointer-events: none; }
