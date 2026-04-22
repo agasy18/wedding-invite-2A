@@ -3,14 +3,14 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Rose, Daisy, Cosmos, Cluster, Petal, ArmDivider, Wreath, FloralPin,
-} from './florals.jsx';
-import { pronoun } from './nameCodec.js';
-import { submitRsvp } from './rsvpForm.js';
-import { VideoPlayer } from './VideoPlayer.jsx';
-import { AgendaBackdrop } from './AgendaBackdrop.jsx';
-import { buildOccupancy, findEmptyRects, rectToCell } from './gridFillers.js';
-import { Reveal } from './Reveal.jsx';
-import { ScrollCue } from './ScrollCue.jsx';
+} from './components/florals.jsx';
+import { pronoun } from './lib/nameCodec.js';
+import { submitRsvp } from './lib/rsvpForm.js';
+import { VideoPlayer } from './components/VideoPlayer.jsx';
+import { AgendaBackdrop } from './components/AgendaBackdrop.jsx';
+import { buildOccupancy, findEmptyRects, rectToCell } from './lib/gridFillers.js';
+import { Reveal } from './components/Reveal.jsx';
+import { ScrollCue } from './components/ScrollCue.jsx';
 
 // --- Section 1: Hero --------------------------------------------------------
 

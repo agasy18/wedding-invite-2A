@@ -1,4 +1,4 @@
-import { useInView } from './useInView.js';
+import { useInView } from '../hooks/useInView.js';
 
 // Fade + slide-in as the element scrolls into view. `delay` is ms applied
 // to both opacity and transform transitions, useful for staggering siblings.

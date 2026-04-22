@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { FloralDefs } from './florals.jsx';
+import { FloralDefs } from './components/florals.jsx';
 import {
   HeroSection, CountdownSection, ScheduleSection,
   GallerySection, VideoSection, RsvpSection,
 } from './sections.jsx';
-import { readGuestNameFromUrl, readGuestCountFromUrl } from './nameCodec.js';
-import { createIdleDetector } from './idleNudge.js';
+import { readGuestNameFromUrl, readGuestCountFromUrl } from './lib/nameCodec.js';
+import { createIdleDetector } from './lib/idleNudge.js';
 
 const NavDots = ({ sections, active, onGo }) => (
   <nav className="nav-dots" aria-label="sections">

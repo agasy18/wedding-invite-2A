@@ -2,7 +2,7 @@
 // own play overlay, progress bar, and mute toggle in the site's palette.
 
 import { useState, useEffect, useRef } from 'react';
-import { VIDEO_SOURCES, VIDEO_POSTER } from './videoConfig.js';
+import { VIDEO_SOURCES, VIDEO_POSTER } from '../lib/videoConfig.js';
 
 function formatTime(sec) {
   if (!Number.isFinite(sec)) return '0:00';

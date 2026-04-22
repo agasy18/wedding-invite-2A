@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { FloralDefs, Rose, Cosmos, ArmDivider } from './florals.jsx';
+import { FloralDefs, Rose, Cosmos, ArmDivider } from './components/florals.jsx';
 import {
   encodeName, isDictionaryHit, countNameTokens, buildPersonalUrl,
-} from './nameCodec.js';
-import { checkPassphrase, isUnlocked, markUnlocked } from './builderAuth.js';
+} from './lib/nameCodec.js';
+import { checkPassphrase, isUnlocked, markUnlocked } from './lib/builderAuth.js';
 
 const STORAGE_KEY = 'aa_guests_v2';
 const LEGACY_STORAGE_KEY = 'aa_guests_v1';
