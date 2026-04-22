@@ -219,6 +219,30 @@ describe('rectToCell', () => {
     expect(r.colSpan).toBeGreaterThanOrEqual(1);
     expect(r.rowSpan).toBeGreaterThanOrEqual(1);
   });
+
+  it('recovers the correct rowSpan for a 3-row-tall tile in the production gallery', () => {
+    // Regression: an earlier version of the hook inferred rowStride from the
+    // delta between the first two distinct tile TOPS. With dense packing, the
+    // second distinct top could be 2 rows below the first instead of 1,
+    // doubling the inferred stride — and collapsing every tile to rowSpan=1.
+    // Here we use the real production numbers to prove rectToCell recovers
+    // the correct spans as long as the hook feeds it the true rowStride.
+    const production = { colStride: 133.328, rowStride: 229, gapX: 12, gapY: 12 };
+    // span-hero (3 cols x 3 rows): width = 3*133.328 + 2*12 = 423.984
+    //                              height = 3*217 + 2*12 = 675
+    const hero = rectToCell(
+      { x: 0, y: 0, width: 423.984, height: 675 },
+      production
+    );
+    expect(hero).toEqual({ col: 0, row: 0, colSpan: 3, rowSpan: 3 });
+    // span-wide (4 cols x 2 rows): width = 4*133.328 + 3*12 = 569.312
+    //                              height = 2*217 + 1*12 = 446
+    const wide = rectToCell(
+      { x: 2 * (133.328 + 12), y: 2 * 229, width: 569.312, height: 446 },
+      production
+    );
+    expect(wide).toEqual({ col: 2, row: 2, colSpan: 4, rowSpan: 2 });
+  });
 });
 
 describe('buildOccupancy + findEmptyRects — integration', () => {

@@ -249,25 +249,27 @@ const useGridFillers = (gridRef, photoCount) => {
 
     const measure = () => {
       const cs = getComputedStyle(grid);
-      const colTracks = cs.gridTemplateColumns.split(' ').map(parseFloat).filter(n => !isNaN(n));
+      const colTracks = cs.gridTemplateColumns.split(/\s+/).map(parseFloat).filter(n => !isNaN(n));
       const cols = colTracks.length;
-      if (cols < 2) { setRects([]); return; } // not laid out yet
+      if (cols < 2) { setRects([]); return; }
       const colStride = colTracks[0];
       const gapX = parseFloat(cs.columnGap || cs.gap || '0') || 0;
       const gapY = parseFloat(cs.rowGap || cs.gap || '0') || 0;
+
+      // Row height from gridTemplateRows (resolved track list). An earlier
+      // version derived this from the delta between the first two distinct
+      // tile tops, which broke under grid-auto-flow: dense — a 3-row-tall
+      // hero tile could push the second unique top 2 rows down, doubling
+      // the inferred stride and collapsing every tile to rowSpan=1.
+      const rowTracks = cs.gridTemplateRows.split(/\s+/).map(parseFloat).filter(n => !isNaN(n));
+      const rowHeight = rowTracks[0] || parseFloat(cs.gridAutoRows) || 120;
+      const rowStride = rowHeight + gapY;
+      if (rowStride <= 0) { setRects([]); return; }
 
       const gridRect = grid.getBoundingClientRect();
       const tiles = Array.from(grid.querySelectorAll('.gm-item'));
       if (tiles.length === 0) { setRects([]); return; }
 
-      // Infer row stride from the smallest vertical delta between any two
-      // tile tops. If all tiles happen to share a top (only one row visible),
-      // fall back to grid-auto-rows. rowStride includes one row gap.
-      const tops = [...new Set(tiles.map(t => Math.round(t.getBoundingClientRect().top - gridRect.top)))].sort((a, b) => a - b);
-      const rowStride = tops.length > 1 ? (tops[1] - tops[0]) : (parseFloat(cs.gridAutoRows) || 120);
-      if (rowStride <= 0) { setRects([]); return; }
-
-      // Convert each tile rect to cell coordinates, then compute empty rects.
       const placed = tiles.map(t => {
         const r = t.getBoundingClientRect();
         return rectToCell(
@@ -275,12 +277,9 @@ const useGridFillers = (gridRef, photoCount) => {
           { colStride, rowStride, gapX, gapY }
         );
       });
-      const occ = buildOccupancy(placed, cols);
-      setRects(findEmptyRects(occ));
+      setRects(findEmptyRects(buildOccupancy(placed, cols)));
     };
 
-    // Initial measure needs to wait for images to load (they affect nothing
-    // here since grid is fixed-row, but run on the next frame to be safe).
     const raf = requestAnimationFrame(measure);
     const ro = new ResizeObserver(measure);
     ro.observe(grid);
