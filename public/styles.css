@@ -111,16 +111,24 @@ body::before {
   background:
     radial-gradient(ellipse at 50% 40%, rgba(251,245,236,1) 0%, rgba(246,237,221,1) 60%, rgba(240,225,205,0.9) 100%);
   min-height: 100dvh;
+  /* Exactly one viewport tall — the wreath + names must never push the hero
+     taller than the visible area, since it's the landing slide and the user
+     shouldn't need to scroll inside it. */
+  height: 100dvh;
   padding-top: clamp(40px, 8dvh, 80px);
 }
 
 .hero-inner {
   position: relative;
-  width: min(780px, 100%);
+  /* Fit within the hero's content box, whichever is the tighter constraint. */
+  width: min(780px, 100%, 88dvh);
   aspect-ratio: 1 / 1.1;
+  max-height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 1;
+  min-height: 0;
 }
 
 .hero-wreath {
@@ -134,8 +142,10 @@ body::before {
 }
 
 .hero-wreath > div {
-  width: min(760px, 92vw) !important;
-  height: min(760px, 92vw) !important;
+  /* Wreath caps to the smaller of viewport width or hero-inner height, so it
+     scales down together with the aspect-ratio container on short screens. */
+  width: min(760px, 92vw, 88dvh) !important;
+  height: min(760px, 92vw, 88dvh) !important;
 }
 
 @keyframes breathe {
