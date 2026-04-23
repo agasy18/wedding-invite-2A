@@ -113,7 +113,7 @@ const App = () => {
     const url = fullUrl(entry.name, entry.guests);
     const text = `Սիրելի ${entry.name}, սիրով հրավիրում ենք Ձեզ մեր հարսանյաց արարողությանը: ${url}`;
     if (navigator.share) {
-      navigator.share({ title: 'Աղասի և Աննա', text, url }).catch(() => {});
+      navigator.share({ title: 'Աղասի և Աննա', text }).catch(() => {});
     } else {
       copy(text, false);
     }
