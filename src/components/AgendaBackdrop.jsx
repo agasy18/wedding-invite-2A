@@ -17,7 +17,7 @@ const IMAGES = [
   { src: 'agenda-bg/06-winery-snow.jpg',         alt: 'Ոսկեվազ ձյան տակ' },
 ];
 
-const INTERVAL = 7000; // ms between cross-fades
+const INTERVAL = 4500; // ms between cross-fades
 const REDUCED = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export const AgendaBackdrop = () => {

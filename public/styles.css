@@ -456,8 +456,8 @@ body::before {
      when a slide is deactivated, the transform doesn't snap BACK from
      1.14 to 1.02 — it holds wherever it ended. The incoming slide's
      `animation` will override the transform anyway while it's active. */
-  transform: scale(1.14);
-  transition: opacity 1.8s ease-in-out;
+  transform: scale(1.18);
+  transition: opacity 1.2s ease-in-out;
   will-change: opacity, transform;
 }
 
@@ -465,20 +465,17 @@ body::before {
   /* Photo is decorative, not content — keep it at low opacity so text
      on top stays clearly readable. */
   opacity: 0.3;
-  /* Animation duration slightly LONGER than the JS cross-fade interval
-     (7s) so the slide is replaced before the zoom ever hits its ease-out
-     tail. That keeps the motion smooth and guarantees no visible "jump"
-     back to scale 1.02 at the end of a cycle. */
-  animation: agenda-kb 9s linear forwards;
+  /* Zoom runs slightly LONGER than the JS interval (4.5s) so the slide is
+     replaced before the zoom plateaus — keeps the motion continuous and
+     avoids any visible snap when the next slide takes over. */
+  animation: agenda-kb 6s linear forwards;
 }
 
 @keyframes agenda-kb {
-  /* Linear, monotonic zoom-in over the whole visible window — no pan.
-     Pan was the source of the "shake": each slide has its own random
-     target offset, so handoff between slides flicked the image. Pure
-     zoom feels like a Ken Burns still without the twitch. */
+  /* Linear, monotonic zoom-in. Slightly larger end-scale than before to
+     keep the sense of motion alive with the shorter animation window. */
   0%   { transform: scale(1.02); }
-  100% { transform: scale(1.14); }
+  100% { transform: scale(1.18); }
 }
 
 /* Cream wash — lifts the photo toward the paper palette instead of
