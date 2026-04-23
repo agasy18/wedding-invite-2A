@@ -290,7 +290,6 @@ const useGridFillers = (gridRef, photoCount) => {
 
 export const GallerySection = () => {
   const photos = [
-    { n: '08', span: 'span-hero' },   // ring — full-width anchor/opener
     { n: '02', span: 'span-tall' },
     { n: '03', span: 'span-tall' },
     { n: '04', span: 'span-1' },
